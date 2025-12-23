@@ -18,6 +18,8 @@ export class AdjacencyGraph {
             this.addVertex(vertexID);
         }
 
+        if (Array.from(this.adjacentList.get(vertexID)!).some((thread) => thread.getDestination() === destinationVertexID)){ return }
+
         this.adjacentList.get(vertexID)?.add(new BaseThread(destinationVertexID));
     }
 
