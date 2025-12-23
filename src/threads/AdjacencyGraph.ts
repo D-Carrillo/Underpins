@@ -18,12 +18,16 @@ export class AdjacencyGraph {
             this.addVertex(vertexID);
         }
 
-        if (Array.from(this.adjacentList.get(vertexID)!).some((thread) => thread.getDestination() === destinationVertexID)){ return }
+        if (Array.from(this.adjacentList.get(vertexID)!).some(thread => thread.getDestination() === destinationVertexID)){ return }
 
         this.adjacentList.get(vertexID)?.add(new BaseThread(destinationVertexID));
     }
 
-    public removeEdge = (vertexID: string, destinationVertex: BaseThread) => this.adjacentList.get(vertexID)?.delete(destinationVertex);
+    public removeEdge = (vertexID: string, destinationID: string) => this.adjacentList.get(vertexID)?.delete(this.getDestinationThreadByID(vertexID, destinationID));
+
+    private getDestinationThreadByID(vertexID: string, destinationID: string):BaseThread{
+        return Array.from(this.adjacentList.get(vertexID)!).filter((thread => thread.getDestination() === destinationID))[0];
+    }
 
     public removeVertex(vertexID: string) {
         if (!this.adjacentList.has(vertexID)){

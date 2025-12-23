@@ -24,7 +24,7 @@ describe("Adjacency Graph tests", () => {
     });
 
     it('should create the right thread with the right destination', () => {
-        const hasDestination = Array.from(edges!).some((thread) => thread.getDestination() === dest);
+        const hasDestination = Array.from(edges!).some(thread => thread.getDestination() === dest);
 
         expect(hasDestination).toBe(true);
     });
@@ -42,7 +42,25 @@ test("No duplicates occur when trying to add the same destination", () => {
 
     expect(edges?.size).toBe(1);
 
-    const count = Array.from(edges!).filter((thread) => thread.getDestination() === dest).length;
+    const count = Array.from(edges!).filter(thread => thread.getDestination() === dest).length;
 
     expect(count).toBe(1);
 });
+
+test("Remove vertex function actually removes the wanted vertex", () => {
+    let graph = new AdjacencyGraph();
+    const origin = "VertexID";
+    const dest = "DestinationID"
+
+    graph.addEdge(origin, dest);
+
+    graph.removeEdge(origin, dest);
+
+    const edges = graph.returnVertexSet(origin);
+
+    expect(edges?.size).toBe(0);
+
+    const count = Array.from(edges!).filter(thread => thread.getDestination() === dest).length;
+
+    expect(count).toBe(0);
+})
