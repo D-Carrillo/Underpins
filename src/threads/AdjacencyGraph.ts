@@ -1,35 +1,41 @@
 import {BaseThread} from "./BaseThread.ts";
 
 export class AdjacencyGraph {
-    private adjacentList: {[keyof: string]: Set<BaseThread>};
+    private adjacentList: Map<string, Set<BaseThread>>;
 
     constructor() {
-        this.adjacentList = {};
+        this.adjacentList = new Map<string, Set<BaseThread>>();
     }
 
     private addVertex(vertexID: string) {
-        if ( !this.adjacentList[vertexID]) {
-            this.adjacentList[vertexID] = new Set<BaseThread>();
+        if (!this.adjacentList.has(vertexID)) {
+            this.adjacentList.set(vertexID, new Set<BaseThread>());
         }
     }
 
     public addEdge(vertexID: string, destinationVertexID: string) {
-        if (!this.adjacentList[vertexID]) {
+        if (!this.adjacentList.has(vertexID)) {
             this.addVertex(vertexID);
         }
 
-        this.adjacentList[vertexID].add(new BaseThread(destinationVertexID));
+        this.adjacentList.get(vertexID)?.add(new BaseThread(destinationVertexID));
     }
 
-    public removeEdge = (vertexID: string, destinationVertex: BaseThread) => this.adjacentList[vertexID].delete(destinationVertex);
+    public removeEdge = (vertexID: string, destinationVertex: BaseThread) => this.adjacentList.get(vertexID)?.delete(destinationVertex);
 
     public removeVertex(vertexID: string) {
-        if (!this.adjacentList[vertexID]){
+        if (!this.adjacentList.has(vertexID)){
             return;
         }
 
-        this.adjacentList[vertexID].forEach((thread: BaseThread) => this.removeEdge(vertexID, thread));
+        this.adjacentList.get(vertexID)?.forEach((thread: BaseThread) => this.removeEdge(vertexID, thread));
 
-        delete this.adjacentList[vertexID];
+        this.adjacentList.delete(vertexID);
     }
+
+    public getVertexesAmount = (): number => this.adjacentList.size;
+
+    public containsVertex = (vertexID: string ): boolean => this.adjacentList.has(vertexID);
+
+    public returnVertexSet = (vertexID: string): Set<BaseThread> | undefined => this.adjacentList.get(vertexID);
 }
