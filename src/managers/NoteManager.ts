@@ -1,16 +1,17 @@
 import {TextNote} from "../notes/TextNote.ts";
 import NoteFactory from "../factories/NoteFactory.ts";
 import { makeAutoObservable } from "mobx";
+import {BaseNote} from "../notes/BaseNote.ts";
 
 class ManagerForNotes{
-    private notes: TextNote[];
+    private notes: BaseNote[];
 
     constructor() {
         this.notes = this.loadNotes();
         makeAutoObservable(this);
     }
 
-    public getNotes(): TextNote[] {
+    public getNotes(): BaseNote[] {
         return this.notes;
     }
 
@@ -19,7 +20,7 @@ class ManagerForNotes{
     // LoadNotesFromJSON()
 
 
-    AddANote(newNote : TextNote){
+    AddANote(newNote : BaseNote){
         this.notes.push(newNote);
     }
 
@@ -45,7 +46,7 @@ class ManagerForNotes{
     }
 
     //Only for when we don't have JSON
-    loadNotes(): TextNote[] {
+    loadNotes(): BaseNote[] {
         return [new TextNote("Type Here", 100, 200), new TextNote("Type here \n and here", 400, 100)];
     }
 

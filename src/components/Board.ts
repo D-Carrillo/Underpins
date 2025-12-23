@@ -19,7 +19,7 @@ export class Board {
 
         this.loadMenu();
         this.loadSavedNotes();
-        this.observerFunction();
+        this.observerFunctionForNotes();
 
         // app.renderer.on('resize', () => this.OnResize());
     }
@@ -28,7 +28,7 @@ export class Board {
         NotesManager.getNotes().forEach(note => this.createVisualNote(note));
     }
 
-    private observerFunction() {
+    private observerFunctionForNotes() {
         observe(NotesManager.getNotes(), (change) => {
             if (change.type === "splice") {
                 change.added.forEach((note) => {
