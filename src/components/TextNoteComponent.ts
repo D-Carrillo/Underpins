@@ -1,18 +1,13 @@
 import {TextNote as TextN} from "../notes/TextNote.ts";
 import {
-    Text,
-    TextStyle,
     Container,
     ContainerChild,
     FederatedPointerEvent,
-    Graphics,
-    Application,
+    Graphics, Text, TextStyle
 } from "pixi.js";
 import {openEditor} from "./TextEditor.ts";
 import {useContextMenu} from "../menus/BaseMenu.ts";
 import {NoteMenu} from "../menus/NoteMenu.ts";
-
-//Now that there is no react, we can make a baseclass for this which would contain the listeners and the makeDraggable
 
 export class TextNoteComponent {
     private readonly note: TextN
@@ -21,47 +16,52 @@ export class TextNoteComponent {
         this.note = concrete_note;
     }
 
-    public makeNote(app: Application): Container {
+    public makeNote(stage: Container<ContainerChild>): Container {
         const NoteGroup = new Container();
 
-        //This is going to be polymorphic when the logic has been extracted into classes
-        this.MakeNoteGraphics(NoteGroup, app);
+        this.MakeNoteGraphics(NoteGroup, stage);
 
-        app.stage.addChild(NoteGroup);
+        stage.addChild(NoteGroup);
 
         return NoteGroup;
     }
 
-    private MakeNoteGraphics(NoteGroup: Container<ContainerChild>, app: Application ) {
+    private MakeNoteGraphics(NoteGroup: Container<ContainerChild>, stage: Container<ContainerChild> ) {
         const NoteGraphics = new Graphics().rect(this.note.position.x, this.note.position.y, this.note.sizes.width, this.note.sizes.height).fill('fffc99');
         NoteGroup.addChild(NoteGraphics);
 
         const noteText = this.makeTheTextGraphic();
         NoteGroup.addChild(noteText);
 
-        this.makeDraggable(NoteGroup, app, noteText);
+        this.makeDraggable(NoteGroup, stage, noteText);
+        this.makeEditable(NoteGroup);
 
         return NoteGraphics;
     }
 
-    private makeTheTextGraphic() {
+    private makeTheTextGraphic(): Text {
         const style = new TextStyle({
-            fill: `#000000`,
-            fontSize: 15,
-            fontFamily: 'Arial',
+            fontFamily: "Arial",
+            fontSize: 16,
+            fill: 0x000000,
+            padding: 1,
             wordWrap: true,
-            wordWrapWidth: this.note.sizes.width
+            wordWrapWidth: this.note.sizes.width,
         })
 
-        return new Text({
-            text: `${this.note.content}`,
+        const text = new Text({
+            text: this.note.content,
             style,
-            x: this.note.position.x,
-            y: this.note.position.y,
+            resolution: window.devicePixelRatio,
         });
+
+        text.x = this.note.position.x;
+        text.y = this.note.position.y;
+
+        return text
     }
 
-    private makeDraggable(target: Container, app: Application, text: Text) {
+    private makeDraggable(target: Container, stage: Container<ContainerChild>, text: Text) {
         target.eventMode = 'dynamic';
         target.cursor = 'pointer';
         text.eventMode = 'static';
@@ -81,7 +81,7 @@ export class TextNoteComponent {
             offset.x = target.x - localPos.x;
             offset.y = target.y - localPos.y;
 
-            app.stage.on('pointermove', onDragMove);
+            stage.on('pointermove', onDragMove);
         }
 
         function onDragMove( event: FederatedPointerEvent) {
@@ -98,9 +98,9 @@ export class TextNoteComponent {
             if(dragTarget) {
                 const distance = Math.sqrt(Math.pow(dragTarget.x - this.note.position.x,2) + Math.pow(dragTarget.y - this.note.position.y, 2))
 
-                distance > 5 ? this.note.changeCoordinate(dragTarget.x, dragTarget.y) : openEditor(text, app, this.note);
+                distance > 5 ? this.note.changeCoordinate(dragTarget.x, dragTarget.y) : openEditor(text, this.note);
 
-                app.stage.off('pointermove', onDragMove);
+                stage.off('pointermove', onDragMove);
                 dragTarget.alpha = 1;
 
                 dragTarget = null;
@@ -109,7 +109,9 @@ export class TextNoteComponent {
 
         target.on('pointerup', onDragEnd);
         target.on('pointerupoutside', onDragEnd);
+    }
 
+    private makeEditable(target: Container) {
         target.on("rightclick", (event) => {
             useContextMenu(event.nativeEvent as MouseEvent, NoteMenu, this.note.id);
         })

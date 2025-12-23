@@ -8,9 +8,13 @@ async function init() {
     resizeTo: window,
     antialias:true,
     background: '#f8f8ff',
+    resolution: window.devicePixelRatio,
+    autoDensity: true,
+    roundPixels: true,
   });
 
   document.body.appendChild(app.canvas);
+
 
   const myBoard = new Board(app);
 

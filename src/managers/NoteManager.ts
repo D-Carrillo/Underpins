@@ -46,7 +46,7 @@ class ManagerForNotes{
 
     //Only for when we don't have JSON
     loadNotes(): TextNote[] {
-        return [new TextNote("Type Here", 100, 200), new TextNote("Type here", 400, 100)];
+        return [new TextNote("Type Here", 100, 200), new TextNote("Type here \n and here", 400, 100)];
     }
 
 }

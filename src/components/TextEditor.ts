@@ -1,12 +1,7 @@
-import {Application, Text} from "pixi.js";
+import {Text} from "pixi.js";
 import {TextNote} from "../notes/TextNote.ts";
 
-const getCanvasBounds = (app: Application) => {
-    return app.canvas.getBoundingClientRect();
-};
-
-export function openEditor(pixiText: Text, app: Application, note: TextNote){
-    const canvasBounds = getCanvasBounds(app);
+export function openEditor(pixiText: Text, note: TextNote){
     const globalPos = pixiText.getGlobalPosition();
 
     const textarea = document.createElement('textarea');
@@ -15,8 +10,8 @@ export function openEditor(pixiText: Text, app: Application, note: TextNote){
 
     Object.assign(textarea.style, {
         position: 'absolute',
-        left: `${canvasBounds.left + globalPos.x}px`,
-        top: `${canvasBounds.top + globalPos.y}px`,
+        left: `${globalPos.x - 2}px`,
+        top: `${ globalPos.y - 1}px`,
         width: `${note.sizes.width}px`,
         height: `${note.sizes.height}px`,
         fontSize: `${pixiText.style.fontSize}px`,
@@ -26,11 +21,13 @@ export function openEditor(pixiText: Text, app: Application, note: TextNote){
         border: 'none',
         outline: 'none',
         resize: 'none',
+        padding: `none`,
         overflow: 'hidden',
-        lineHeight: pixiText.style.lineHeight ? `${pixiText.style.lineHeight}px` : 'normal'
+        margin: `0px`,
+        transformOrigin: 'left top',
     });
 
-    textarea.value = pixiText.text;
+    textarea.value = note.content;
     document.body.appendChild(textarea);
     textarea.focus();
 
