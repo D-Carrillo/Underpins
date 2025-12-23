@@ -1,15 +1,15 @@
 import {BaseThread} from "./BaseThread.ts";
 
 export class AdjacencyGraph {
-    private adjacentList: Map<string, Set<BaseThread>>;
+    private adjacentList: Map<string, Map<string, BaseThread>>;
 
     constructor() {
-        this.adjacentList = new Map<string, Set<BaseThread>>();
+        this.adjacentList = new Map<string, Map<string, BaseThread>>();
     }
 
     private addVertex(vertexID: string) {
         if (!this.adjacentList.has(vertexID)) {
-            this.adjacentList.set(vertexID, new Set<BaseThread>());
+            this.adjacentList.set(vertexID, new Map<string, BaseThread>());
         }
     }
 
@@ -18,24 +18,14 @@ export class AdjacencyGraph {
             this.addVertex(vertexID);
         }
 
-        if (Array.from(this.adjacentList.get(vertexID)!).some(thread => thread.getDestination() === destinationVertexID)){ return }
+        if (this.adjacentList.get(vertexID)?.has(destinationVertexID)){ return }
 
-        this.adjacentList.get(vertexID)?.add(new BaseThread(destinationVertexID));
+        this.adjacentList.get(vertexID)?.set(destinationVertexID, new BaseThread());
     }
 
-    public removeEdge = (vertexID: string, destinationID: string) => this.adjacentList.get(vertexID)?.delete(this.getDestinationThreadByID(vertexID, destinationID));
-
-    private getDestinationThreadByID(vertexID: string, destinationID: string):BaseThread{
-        return Array.from(this.adjacentList.get(vertexID)!).filter((thread => thread.getDestination() === destinationID))[0];
-    }
+    public removeEdge = (vertexID: string, destinationID: string) => this.adjacentList.get(vertexID)?.delete(destinationID);
 
     public removeVertex(vertexID: string) {
-        if (!this.adjacentList.has(vertexID)){
-            return;
-        }
-
-        this.adjacentList.get(vertexID)?.forEach((thread: BaseThread) => this.removeEdge(vertexID, thread));
-
         this.adjacentList.delete(vertexID);
     }
 
@@ -43,5 +33,5 @@ export class AdjacencyGraph {
 
     public containsVertex = (vertexID: string ): boolean => this.adjacentList.has(vertexID);
 
-    public returnVertexSet = (vertexID: string): Set<BaseThread> | undefined => this.adjacentList.get(vertexID);
+    public returnVertexMap = (vertexID: string)  => this.adjacentList.get(vertexID);
 }
