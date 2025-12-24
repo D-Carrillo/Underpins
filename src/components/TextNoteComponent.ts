@@ -114,6 +114,6 @@ export class TextNoteComponent {
     private makeEditable(target: Container) {
         target.on("rightclick", (event) => {
             useContextMenu(event.nativeEvent as MouseEvent, NoteMenu, this.note.id);
-        })
+        });
     }
 }

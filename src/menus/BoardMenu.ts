@@ -1,6 +1,6 @@
-import { NotesManager} from "../managers/NoteManager.ts";
+import { NotesManager } from "../managers/NoteManager.ts";
 
-export function BoardMenu(event: MouseEvent, menu: HTMLDivElement, type:string): HTMLButtonElement {
+export function BoardMenu(event: MouseEvent, menu: HTMLDivElement, type:string) {
     const button = document.createElement("button");
     button.textContent = "Add New Text Note";
 
@@ -9,5 +9,5 @@ export function BoardMenu(event: MouseEvent, menu: HTMLDivElement, type:string):
         menu.remove();
     };
 
-    return button;
+    menu.appendChild(button);
 }

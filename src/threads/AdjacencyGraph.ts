@@ -20,7 +20,7 @@ export class AdjacencyGraph {
 
         if (this.adjacentList.get(vertexID)?.has(destinationVertexID)){ return }
 
-        this.adjacentList.get(vertexID)?.set(destinationVertexID, new BaseThread());
+        this.adjacentList.get(vertexID)?.set(destinationVertexID, new BaseThread(vertexID + '_' + destinationVertexID));
     }
 
     public removeEdge = (vertexID: string, destinationID: string) => this.adjacentList.get(vertexID)?.delete(destinationID);

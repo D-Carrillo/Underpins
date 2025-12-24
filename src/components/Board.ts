@@ -12,7 +12,7 @@ import {BaseThread} from "../threads/BaseThread.ts";
 export class Board {
     private readonly stage: Container<ContainerChild>
     private noteMap = new Map<string, Container>();
-    private threadMap = new Map<string, Container>
+    private threadMap = new Map<string, Container>();
 
     constructor(app: Application) {
         this.stage = app.stage;
@@ -25,6 +25,8 @@ export class Board {
         this.loadSavedNotes();
         this.loadThreads();
         this.observerFunctionForNotes();
+
+        console.log(this.noteMap.size);
 
         // app.renderer.on('resize', () => this.OnResize());
     }
@@ -67,7 +69,7 @@ export class Board {
 
     private makeThreadVisual(originID: string, destinationID: string, threadType: BaseThread) {
         const singularThreadContainer = new ThreadComponent(this.noteMap.get(originID)!, this.noteMap.get(destinationID)!, threadType).makeThread(this.stage)
-        this.threadMap.set(originID + destinationID, singularThreadContainer);
+        this.threadMap.set(threadType.getThreadID(), singularThreadContainer);
     }
 
     private loadMenu() {

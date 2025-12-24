@@ -1,9 +1,10 @@
 import {Container, Ticker, ContainerChild, Graphics, } from "pixi.js";
 import {BaseThread} from "../threads/BaseThread.ts";
+import {useContextMenu} from "../menus/BaseMenu.ts";
+import {ThreadMenu} from "../menus/ThreadMenu.ts";
 
 export class ThreadComponent {
-    private line = new Graphics();
-    private toNote: Container<ContainerChild>;
+    private readonly toNote: Container<ContainerChild>;
     private fromNote: Container<ContainerChild>;
     private toNotePos: {x: number, y: number};
     private fromNotePos: {x: number, y: number};
@@ -19,23 +20,23 @@ export class ThreadComponent {
 
     public makeThread( stage: Container<ContainerChild> ): Container<ContainerChild> {
 
-        stage.addChild(this.line);
+        const line = new Graphics();
 
-        this.drawLine();
+        stage.addChild(line);
+
+        this.drawLine(line);
+
+        this.makeEditable(line);
 
         Ticker.shared.add(() => {
-           this.updateLine();
+           this.updateLine(line);
         });
 
-        const container = new Container();
-
-        container.addChild(this.toNote);
-
-        return container;
+        return line;
     }
 
-    private drawLine() {
-        const parent = this.line.parent!;
+    private drawLine(line: Graphics) {
+        const parent = line.parent!;
 
         const startBounds = this.fromNote.getBounds();
         const endBounds = this.toNote.getBounds();
@@ -43,18 +44,16 @@ export class ThreadComponent {
         const start = parent.toLocal(startBounds);
         const end = parent.toLocal(endBounds);
 
-        this.line.moveTo(start.x + startBounds.width / 2, start.y + 10 ).lineTo(end.x + endBounds.width / 2 , end.y + 10).stroke({width: 2, color: this.threadType.getColor()});
+        line.moveTo(start.x + startBounds.width / 2, start.y + 10 ).lineTo(end.x + endBounds.width / 2 , end.y + 10).stroke({width: 2, color: this.threadType.getColor()});
     }
 
-    private updateLine() {
+    private updateLine(line: Graphics) {
         if (this.notesMoved()) {
-            this.line.clear();
-            this.drawLine()
+            line.clear();
+            this.drawLine(line)
 
             this.toNotePos = {x: this.toNote.getBounds().x, y: this.toNote.getBounds().y};
             this.fromNotePos =  {x: this.fromNote.getBounds().x, y: this.fromNote.getBounds().y};
-
-            console.log("Running");
         }
     }
 
@@ -70,5 +69,14 @@ export class ThreadComponent {
             Math.abs(end.x - this.toNotePos.x) > EPS ||
             Math.abs(end.y - this.toNotePos.y) > EPS
         );
+    }
+
+    private makeEditable(target: Container) {
+        target.eventMode = 'static';
+        target.cursor = 'pointer';
+
+        target.on("rightclick", (event) => {
+            useContextMenu(event.nativeEvent as MouseEvent, ThreadMenu, this.threadType.getThreadID());
+        });
     }
 }
