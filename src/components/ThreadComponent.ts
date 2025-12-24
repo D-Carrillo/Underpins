@@ -17,7 +17,7 @@ export class ThreadComponent {
         this.threadType = threadType;
     }
 
-    public makeThread( stage: Container<ContainerChild> ) {
+    public makeThread( stage: Container<ContainerChild> ): Container<ContainerChild> {
 
         stage.addChild(this.line);
 
@@ -26,6 +26,12 @@ export class ThreadComponent {
         Ticker.shared.add(() => {
            this.updateLine();
         });
+
+        const container = new Container();
+
+        container.addChild(this.toNote);
+
+        return container;
     }
 
     private drawLine() {

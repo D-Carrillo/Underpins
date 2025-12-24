@@ -7,10 +7,12 @@ import {useContextMenu} from "../menus/BaseMenu.ts";
 import {BoardMenu} from "../menus/BoardMenu.ts";
 import {ThreadComponent} from "./ThreadComponent.ts";
 import { ThreadManager } from "../managers/ThreadManager.ts";
+import {BaseThread} from "../threads/BaseThread.ts";
 
 export class Board {
     private readonly stage: Container<ContainerChild>
     private noteMap = new Map<string, Container>();
+    private threadMap = new Map<string, Container>
 
     constructor(app: Application) {
         this.stage = app.stage;
@@ -28,18 +30,18 @@ export class Board {
     }
 
     private loadSavedNotes(){
-        NotesManager.getNotes().forEach(note => this.makeNoteVisual(note));
+        NotesManager.getNotes().forEach(note => this.createVisualNote(note));
     }
 
     private loadThreads() {
-        NotesManager.getNotes().forEach(note => {this.makeThreadVisual(note.id);});
+        NotesManager.getNotes().forEach(note => {ThreadManager.getThreadGraph().returnVertexMap(note.id)?.forEach((threadType, destinationID) => {this.makeThreadVisual(note.id, destinationID, threadType);})});
     }
 
     private observerFunctionForNotes() {
         observe(NotesManager.getNotes(), (change) => {
             if (change.type === "splice") {
                 change.added.forEach((note) => {
-                    this.makeNoteVisual(note)
+                    this.createVisualNote(note)
                 });
 
                 change.removed.forEach((note) => {
@@ -58,15 +60,14 @@ export class Board {
     public update() {
     }
 
-    private makeNoteVisual(note: TextNote) {
+    private createVisualNote(note: TextNote) {
         const singularNoteContainer = new TextNoteComponent(note).makeNote(this.stage);
         this.noteMap.set(note.id, singularNoteContainer);
     }
 
-    private makeThreadVisual(originID: string) {
-        ThreadManager.getThreadGraph().returnVertexMap(originID)?.forEach((threadType, destinationID) => {
-            new ThreadComponent(this.noteMap.get(originID)!, this.noteMap.get(destinationID)!, threadType).makeThread(this.stage)
-        })
+    private makeThreadVisual(originID: string, destinationID: string, threadType: BaseThread) {
+        const singularThreadContainer = new ThreadComponent(this.noteMap.get(originID)!, this.noteMap.get(destinationID)!, threadType).makeThread(this.stage)
+        this.threadMap.set(originID + destinationID, singularThreadContainer);
     }
 
     private loadMenu() {
@@ -77,3 +78,4 @@ export class Board {
         })
     }
 }
+
