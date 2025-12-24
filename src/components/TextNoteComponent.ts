@@ -26,7 +26,7 @@ export class TextNoteComponent {
         return NoteGroup;
     }
 
-    private MakeNoteGraphics(NoteGroup: Container<ContainerChild>, stage: Container<ContainerChild> ) {
+    private MakeNoteGraphics(NoteGroup: Container<ContainerChild>, stage: Container<ContainerChild> ): Graphics {
         const NoteGraphics = new Graphics().rect(this.note.position.x, this.note.position.y, this.note.sizes.width, this.note.sizes.height).fill('fffc99');
         NoteGroup.addChild(NoteGraphics);
 

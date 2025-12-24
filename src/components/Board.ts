@@ -5,6 +5,7 @@ import {NotesManager} from "../managers/NoteManager.ts";
 import { observe } from "mobx";
 import {useContextMenu} from "../menus/BaseMenu.ts";
 import {BoardMenu} from "../menus/BoardMenu.ts";
+import {ThreadComponent} from "./ThreadComponent.ts";
 
 export class Board {
     private readonly stage: Container<ContainerChild>
@@ -19,6 +20,7 @@ export class Board {
 
         this.loadMenu();
         this.loadSavedNotes();
+        new ThreadComponent(this.noteMap.get(NotesManager.getNotes()[0].id)!, this.noteMap.get(NotesManager.getNotes()[1].id)!).makeThread(this.stage);
         this.observerFunctionForNotes();
 
         // app.renderer.on('resize', () => this.OnResize());
