@@ -13,6 +13,10 @@ class ManagerForThreads{
     private loadThreadGraph() {
         this.threadGraph.addEdge(NotesManager.getNotes()[0].id, NotesManager.getNotes()[1].id);
     }
+
+    public getThreadGraph() {
+        return this.threadGraph;
+    }
 }
 
 export const ThreadManager = new ManagerForThreads();

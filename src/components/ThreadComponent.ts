@@ -1,4 +1,5 @@
 import {Container, Ticker, ContainerChild, Graphics, } from "pixi.js";
+import {BaseThread} from "../threads/BaseThread.ts";
 
 export class ThreadComponent {
     private line = new Graphics();
@@ -6,12 +7,14 @@ export class ThreadComponent {
     private fromNote: Container<ContainerChild>;
     private toNotePos: {x: number, y: number};
     private fromNotePos: {x: number, y: number};
+    private threadType: BaseThread;
 
-    constructor(fromNote: Container<ContainerChild>, toNote: Container<ContainerChild>) {
+    constructor(fromNote: Container<ContainerChild>, toNote: Container<ContainerChild>, threadType: BaseThread) {
         this.fromNote = fromNote;
         this.toNote = toNote;
         this.toNotePos = {x:toNote.getBounds().x, y: toNote.getBounds().y};
         this.fromNotePos = {x:fromNote.getBounds().x, y: fromNote.getBounds().y};
+        this.threadType = threadType;
     }
 
     public makeThread( stage: Container<ContainerChild> ) {
@@ -34,7 +37,7 @@ export class ThreadComponent {
         const start = parent.toLocal(startBounds);
         const end = parent.toLocal(endBounds);
 
-        this.line.moveTo(start.x + startBounds.width / 2, start.y + 10 ).lineTo(end.x + endBounds.width / 2 , end.y + 10).stroke({width: 2, color: 0x000000});
+        this.line.moveTo(start.x + startBounds.width / 2, start.y + 10 ).lineTo(end.x + endBounds.width / 2 , end.y + 10).stroke({width: 2, color: this.threadType.getColor()});
     }
 
     private updateLine() {

@@ -6,6 +6,7 @@ import { observe } from "mobx";
 import {useContextMenu} from "../menus/BaseMenu.ts";
 import {BoardMenu} from "../menus/BoardMenu.ts";
 import {ThreadComponent} from "./ThreadComponent.ts";
+import { ThreadManager } from "../managers/ThreadManager.ts";
 
 export class Board {
     private readonly stage: Container<ContainerChild>
@@ -20,21 +21,25 @@ export class Board {
 
         this.loadMenu();
         this.loadSavedNotes();
-        new ThreadComponent(this.noteMap.get(NotesManager.getNotes()[0].id)!, this.noteMap.get(NotesManager.getNotes()[1].id)!).makeThread(this.stage);
+        this.loadThreads();
         this.observerFunctionForNotes();
 
         // app.renderer.on('resize', () => this.OnResize());
     }
 
     private loadSavedNotes(){
-        NotesManager.getNotes().forEach(note => this.createVisualNote(note));
+        NotesManager.getNotes().forEach(note => this.makeNoteVisual(note));
+    }
+
+    private loadThreads() {
+        NotesManager.getNotes().forEach(note => {this.makeThreadVisual(note.id);});
     }
 
     private observerFunctionForNotes() {
         observe(NotesManager.getNotes(), (change) => {
             if (change.type === "splice") {
                 change.added.forEach((note) => {
-                    this.createVisualNote(note)
+                    this.makeNoteVisual(note)
                 });
 
                 change.removed.forEach((note) => {
@@ -53,9 +58,15 @@ export class Board {
     public update() {
     }
 
-    private createVisualNote(note: TextNote) {
+    private makeNoteVisual(note: TextNote) {
         const singularNoteContainer = new TextNoteComponent(note).makeNote(this.stage);
         this.noteMap.set(note.id, singularNoteContainer);
+    }
+
+    private makeThreadVisual(originID: string) {
+        ThreadManager.getThreadGraph().returnVertexMap(originID)?.forEach((threadType, destinationID) => {
+            new ThreadComponent(this.noteMap.get(originID)!, this.noteMap.get(destinationID)!, threadType).makeThread(this.stage)
+        })
     }
 
     private loadMenu() {
@@ -66,4 +77,3 @@ export class Board {
         })
     }
 }
-
