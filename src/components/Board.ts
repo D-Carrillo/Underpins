@@ -75,7 +75,6 @@ export class Board {
                 }
             });
         });
-
     }
 
     public update() {
@@ -99,4 +98,3 @@ export class Board {
         })
     }
 }
-

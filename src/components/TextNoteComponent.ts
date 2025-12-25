@@ -47,6 +47,7 @@ export class TextNoteComponent {
             padding: 1,
             wordWrap: true,
             wordWrapWidth: this.note.sizes.width,
+            breakWords: true,
         })
 
         const text = new Text({
