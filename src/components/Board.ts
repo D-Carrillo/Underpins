@@ -2,7 +2,7 @@ import {Application, Container, ContainerChild} from "pixi.js";
 import {TextNoteComponent} from "./TextNoteComponent.ts";
 import {TextNote} from "../notes/TextNote.ts";
 import {NotesManager} from "../managers/NoteManager.ts";
-import { observe } from "mobx";
+import {observe, reaction} from "mobx";
 import {useContextMenu} from "../menus/BaseMenu.ts";
 import {BoardMenu} from "../menus/BoardMenu.ts";
 import {ThreadComponent} from "./ThreadComponent.ts";
@@ -25,8 +25,7 @@ export class Board {
         this.loadSavedNotes();
         this.loadThreads();
         this.observerFunctionForNotes();
-
-        console.log(this.noteMap.size);
+        this.observerFunctionForThreads();
 
         // app.renderer.on('resize', () => this.OnResize());
     }
@@ -56,7 +55,27 @@ export class Board {
                     }
                 });
             }
-        })
+        });
+    }
+
+    private observerFunctionForThreads() {
+        reaction(() => ThreadManager.getDeletedThreads().length, (newLength, oldLength) => {
+            const newlyDeleted = ThreadManager.getDeletedThreads().splice(oldLength);
+
+            console.log(newLength);
+            console.log(newlyDeleted);
+
+            newlyDeleted.forEach((thread) => {
+                const visualThread = this.threadMap.get(thread.ID);
+
+                if (visualThread) {
+                    visualThread.destroy({children: true});
+
+                    this.threadMap.delete(thread.ID)
+                }
+            });
+        });
+
     }
 
     public update() {

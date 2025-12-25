@@ -18,8 +18,6 @@ async function init() {
 
   const myBoard = new Board(app);
 
-  console.log("Detective Board Online");
-
   app.ticker.add(() => {
     myBoard.update();
   })
