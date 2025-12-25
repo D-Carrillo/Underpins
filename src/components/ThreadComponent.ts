@@ -1,4 +1,4 @@
-import {Container, Ticker, ContainerChild, Graphics, } from "pixi.js";
+import {Container, Ticker, ContainerChild, Graphics, Sprite, Assets} from "pixi.js";
 import {BaseThread} from "../threads/BaseThread.ts";
 import {useContextMenu} from "../menus/BaseMenu.ts";
 import {ThreadMenu} from "../menus/ThreadMenu.ts";
@@ -22,6 +22,8 @@ export class ThreadComponent {
 
         const line = new Graphics();
 
+        this.makeThePinSprite(stage);
+
         stage.addChild(line);
 
         this.drawLine(line);
@@ -33,6 +35,17 @@ export class ThreadComponent {
         });
 
         return line;
+    }
+
+    private async makeThePinSprite(stage: Container<ContainerChild>) {
+        const texture = await Assets.load('/src/public/pin.png');
+        const pinSprite = Sprite.from(texture);
+
+        pinSprite.anchor.set(0.5)
+        pinSprite.position.set(100,100);
+        pinSprite.scale.set(.5);
+
+        stage.addChild(pinSprite);
     }
 
     private drawLine(line: Graphics) {
