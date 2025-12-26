@@ -1,4 +1,4 @@
-import {Container, Ticker, ContainerChild, Graphics, Sprite, Assets} from "pixi.js";
+import {Container, Ticker, ContainerChild, Graphics, Sprite, Assets, Point, Bounds} from "pixi.js";
 import {BaseThread} from "../threads/BaseThread.ts";
 import {useContextMenu} from "../menus/BaseMenu.ts";
 import {ThreadMenu} from "../menus/ThreadMenu.ts";
@@ -20,9 +20,14 @@ export class ThreadComponent {
 
     public makeThread( stage: Container<ContainerChild> ): Container<ContainerChild> {
 
-        const line = new Graphics();
-
+        //And need to make both the stage and the line into a container.
         this.makeThePinSprite(stage);
+
+        return this.makeLineVisual(stage);
+    }
+
+    private makeLineVisual(stage: Container<ContainerChild>): Graphics {
+        const line = new Graphics();
 
         stage.addChild(line);
 
@@ -31,7 +36,7 @@ export class ThreadComponent {
         this.makeEditable(line);
 
         Ticker.shared.add(() => {
-           this.updateLine(line);
+            this.updateLine(line);
         });
 
         return line;
@@ -42,13 +47,20 @@ export class ThreadComponent {
         const pinSprite = Sprite.from(texture);
 
         pinSprite.anchor.set(0.5)
-        pinSprite.position.set(100,100);
-        pinSprite.scale.set(.5);
+        pinSprite.position.set(100,150);
+        pinSprite.scale.set(.05);
 
         stage.addChild(pinSprite);
     }
 
     private drawLine(line: Graphics) {
+
+        const bounds = this.getTheLocalPosition(line);
+
+        line.moveTo(bounds.start.x + bounds.startBounds.width / 2, bounds.start.y + 10 ).lineTo(bounds.end.x + bounds.endBounds.width / 2 , bounds.end.y + 10).stroke({width: 2, color: this.threadType.getColor()});
+    }
+
+    private getTheLocalPosition(line: Graphics): {start: Point, end: Point, startBounds: Bounds, endBounds: Bounds} {
         const parent = line.parent!;
 
         const startBounds = this.fromNote.getBounds();
@@ -57,7 +69,7 @@ export class ThreadComponent {
         const start = parent.toLocal(startBounds);
         const end = parent.toLocal(endBounds);
 
-        line.moveTo(start.x + startBounds.width / 2, start.y + 10 ).lineTo(end.x + endBounds.width / 2 , end.y + 10).stroke({width: 2, color: this.threadType.getColor()});
+        return {start: start, end: end, startBounds: startBounds, endBounds: endBounds};
     }
 
     private updateLine(line: Graphics) {
