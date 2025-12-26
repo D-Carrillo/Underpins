@@ -21,18 +21,21 @@ export class ThreadComponent {
 
     public makeThread( stage: Container<ContainerChild> ): Container<ContainerChild> {
 
-        //And need to make both the stage and the line into a container.
-        const line = this.makeLineVisual(stage);
+        const container = new Container();
 
-        this.makeThePins(stage, line);
+        const line = this.makeLineVisual(container);
 
-        return line;
+        this.makeThePins(container, line);
+
+        stage.addChild(container);
+
+        return container;
     }
 
-    private makeLineVisual(stage: Container<ContainerChild>): Graphics {
+    private makeLineVisual(container: Container<ContainerChild>): Graphics {
         const line = new Graphics();
 
-        stage.addChild(line);
+        container.addChild(line);
 
         this.drawLine(line);
 
@@ -45,18 +48,18 @@ export class ThreadComponent {
         return line;
     }
 
-    private makeThePins(stage: Container<ContainerChild>, line: Graphics) {
+    private makeThePins(container: Container<ContainerChild>, line: Graphics) {
 
         const bounds = this.getTheLocalPosition(line);
         const threadOriginPos  = this.calculateDisplayCoordinates(bounds.start, bounds.startBounds);
         const threadEndPos = this.calculateDisplayCoordinates(bounds.end, bounds.endBounds);
 
-        this.makeThePinSprite(stage, threadOriginPos, "origin", line);
-        this.makeThePinSprite(stage, threadEndPos, "end", line);
+        this.makeThePinSprite(container, threadOriginPos, "origin", line);
+        this.makeThePinSprite(container, threadEndPos, "end", line);
 
     }
 
-    private async makeThePinSprite(stage: Container<ContainerChild>, pinPos: {x: number, y: number}, place: string, line: Graphics) {
+    private async makeThePinSprite(container: Container<ContainerChild>, pinPos: {x: number, y: number}, place: string, line: Graphics) {
         try {
             const texture = await Assets.load('/pin.png');
             const pinSprite = new Sprite(texture);
@@ -67,7 +70,7 @@ export class ThreadComponent {
 
             pinSprite.eventMode = 'static';
 
-            stage.addChild(pinSprite);
+            container.addChild(pinSprite);
 
             const updateCallback = () => {
                 if (!pinSprite.parent) {

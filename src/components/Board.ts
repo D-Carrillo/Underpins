@@ -62,14 +62,18 @@ export class Board {
         reaction(() => ThreadManager.getDeletedThreads().length, (newLength, oldLength) => {
             const newlyDeleted = ThreadManager.getDeletedThreads().splice(oldLength);
 
+            // How can I remove newLength?
+
             console.log(newLength);
-            console.log(newlyDeleted);
 
             newlyDeleted.forEach((thread) => {
                 const visualThread = this.threadMap.get(thread.ID);
 
                 if (visualThread) {
-                    visualThread.destroy({children: true});
+                    visualThread.destroy({
+                        children: true,
+                        texture: true,
+                    });
 
                     this.threadMap.delete(thread.ID)
                 }
