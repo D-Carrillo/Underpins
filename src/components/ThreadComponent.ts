@@ -1,4 +1,13 @@
-import {Container, Ticker, ContainerChild, Graphics, Sprite, Assets, Point, Bounds} from "pixi.js";
+import {
+    Container,
+    Ticker,
+    ContainerChild,
+    Graphics,
+    Sprite,
+    Assets,
+    Point,
+    Bounds,
+} from "pixi.js";
 import {BaseThread} from "../threads/BaseThread.ts";
 import {useContextMenu} from "../menus/BaseMenu.ts";
 import {ThreadMenu} from "../menus/ThreadMenu.ts";
@@ -19,7 +28,7 @@ export class ThreadComponent {
         this.threadType = threadType;
     }
 
-    public makeThread( stage: Container<ContainerChild> ): Container<ContainerChild> {
+    public makeThreadWithPins(stage: Container<ContainerChild> ): Container<ContainerChild> {
 
         const container = new Container();
 
@@ -41,9 +50,16 @@ export class ThreadComponent {
 
         this.makeEditable(line);
 
-        Ticker.shared.add(() => {
+        const updateCallBack = () => {
+            if (!line.parent) {
+                Ticker.shared.remove(updateCallBack);
+                return;
+            }
+
             this.updateLine(line);
-        });
+        };
+
+        Ticker.shared.add(updateCallBack);
 
         return line;
     }

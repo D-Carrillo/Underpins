@@ -59,12 +59,8 @@ export class Board {
     }
 
     private observerFunctionForThreads() {
-        reaction(() => ThreadManager.getDeletedThreads().length, (newLength, oldLength) => {
-            const newlyDeleted = ThreadManager.getDeletedThreads().splice(oldLength);
-
-            // How can I remove newLength?
-
-            console.log(newLength);
+        reaction(() => ThreadManager.getDeletedThreads().length, (_, oldLength) => {
+            const newlyDeleted = ThreadManager.getDeletedThreads().slice(oldLength);
 
             newlyDeleted.forEach((thread) => {
                 const visualThread = this.threadMap.get(thread.ID);
@@ -72,7 +68,7 @@ export class Board {
                 if (visualThread) {
                     visualThread.destroy({
                         children: true,
-                        texture: true,
+                        texture: false,
                     });
 
                     this.threadMap.delete(thread.ID)
@@ -90,7 +86,7 @@ export class Board {
     }
 
     private makeThreadVisual(originID: string, destinationID: string, threadType: BaseThread) {
-        const singularThreadContainer = new ThreadComponent(this.noteMap.get(originID)!, this.noteMap.get(destinationID)!, threadType).makeThread(this.stage)
+        const singularThreadContainer = new ThreadComponent(this.noteMap.get(originID)!, this.noteMap.get(destinationID)!, threadType).makeThreadWithPins(this.stage)
         this.threadMap.set(threadType.getThreadID(), singularThreadContainer);
     }
 
