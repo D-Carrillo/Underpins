@@ -21,9 +21,12 @@ export class ThreadComponent {
     public makeThread( stage: Container<ContainerChild> ): Container<ContainerChild> {
 
         //And need to make both the stage and the line into a container.
-        this.makeThePinSprite(stage);
 
-        return this.makeLineVisual(stage);
+        const line = this.makeLineVisual(stage);
+
+        this.makeThePins(stage, line);
+
+        return line;
     }
 
     private makeLineVisual(stage: Container<ContainerChild>): Graphics {
@@ -42,22 +45,52 @@ export class ThreadComponent {
         return line;
     }
 
-    private async makeThePinSprite(stage: Container<ContainerChild>) {
-        const texture = await Assets.load('/src/public/pin.png');
-        const pinSprite = Sprite.from(texture);
+    private makeThePins(stage: Container<ContainerChild>, line: Graphics) {
 
-        pinSprite.anchor.set(0.5)
-        pinSprite.position.set(100,150);
-        pinSprite.scale.set(.05);
+        const bounds = this.getTheLocalPosition(line);
+        const threadOriginPos  = this.calculateDisplayCoordinates(bounds.start, bounds.startBounds);
+        const threadEndPos = this.calculateDisplayCoordinates(bounds.end, bounds.endBounds);
 
-        stage.addChild(pinSprite);
+        this.makeThePinSprite(stage, threadOriginPos, "origin", line);
+        this.makeThePinSprite(stage, threadEndPos, "end", line);
+
+    }
+
+    private async makeThePinSprite(stage: Container<ContainerChild>, pinPos: {x: number, y: number}, place: string, line: Graphics) {
+        try {
+            const texture = await Assets.load('/pin.png');
+            const pinSprite = new Sprite(texture);
+
+            pinSprite.anchor.set(0.5)
+            pinSprite.position.set(pinPos.x + 6, pinPos.y - 8);
+            pinSprite.scale.set(.05);
+
+            pinSprite.eventMode = 'static';
+
+            stage.addChild(pinSprite);
+
+            const updateCallback = () => {
+                if (!pinSprite.parent) {
+                    Ticker.shared.remove(updateCallback);
+                    return;
+                }
+                this.updateThreads(pinSprite, place, line);
+            };
+
+            Ticker.shared.add(updateCallback);
+
+        } catch (e) {
+            console.error("Pin failed to load", e);
+        }
     }
 
     private drawLine(line: Graphics) {
 
         const bounds = this.getTheLocalPosition(line);
+        const threadOriginPos  = this.calculateDisplayCoordinates(bounds.start, bounds.startBounds);
+        const threadEndPos  = this.calculateDisplayCoordinates(bounds.end, bounds.endBounds);
 
-        line.moveTo(bounds.start.x + bounds.startBounds.width / 2, bounds.start.y + 10 ).lineTo(bounds.end.x + bounds.endBounds.width / 2 , bounds.end.y + 10).stroke({width: 2, color: this.threadType.getColor()});
+        line.moveTo(threadOriginPos.x, threadOriginPos.y ).lineTo(threadEndPos.x , threadEndPos.y).stroke({width: 2, color: this.threadType.getColor()});
     }
 
     private getTheLocalPosition(line: Graphics): {start: Point, end: Point, startBounds: Bounds, endBounds: Bounds} {
@@ -72,6 +105,10 @@ export class ThreadComponent {
         return {start: start, end: end, startBounds: startBounds, endBounds: endBounds};
     }
 
+    private calculateDisplayCoordinates(positon: Point, bounds: Bounds): {x: number, y: number} {
+        return {x: positon.x + bounds.width / 2, y: bounds.y + 10};
+    }
+
     private updateLine(line: Graphics) {
         if (this.notesMoved()) {
             line.clear();
@@ -80,6 +117,22 @@ export class ThreadComponent {
             this.toNotePos = {x: this.toNote.getBounds().x, y: this.toNote.getBounds().y};
             this.fromNotePos =  {x: this.fromNote.getBounds().x, y: this.fromNote.getBounds().y};
         }
+    }
+
+    private updateThreads(pinSprite: Sprite, place: string, line: Graphics) {
+        const bounds = this.getTheLocalPosition(line);
+        let targetPos: {x: number, y: number};
+
+        if (place === "origin") {
+            targetPos  = this.calculateDisplayCoordinates(bounds.start, bounds.startBounds);
+        }
+
+        else {
+            targetPos  = this.calculateDisplayCoordinates(bounds.end, bounds.endBounds);
+        }
+
+        pinSprite.x = targetPos.x + 6;
+        pinSprite.y = targetPos.y - 8;
     }
 
     private notesMoved(): boolean {
