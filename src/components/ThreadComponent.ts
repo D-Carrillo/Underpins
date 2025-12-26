@@ -9,6 +9,7 @@ export class ThreadComponent {
     private toNotePos: {x: number, y: number};
     private fromNotePos: {x: number, y: number};
     private threadType: BaseThread;
+    private framesSinceMoved = 0;
 
     constructor(fromNote: Container<ContainerChild>, toNote: Container<ContainerChild>, threadType: BaseThread) {
         this.fromNote = fromNote;
@@ -21,7 +22,6 @@ export class ThreadComponent {
     public makeThread( stage: Container<ContainerChild> ): Container<ContainerChild> {
 
         //And need to make both the stage and the line into a container.
-
         const line = this.makeLineVisual(stage);
 
         this.makeThePins(stage, line);
@@ -111,6 +111,7 @@ export class ThreadComponent {
 
     private updateLine(line: Graphics) {
         if (this.notesMoved()) {
+            this.framesSinceMoved = 2;
             line.clear();
             this.drawLine(line)
 
@@ -120,19 +121,21 @@ export class ThreadComponent {
     }
 
     private updateThreads(pinSprite: Sprite, place: string, line: Graphics) {
-        const bounds = this.getTheLocalPosition(line);
-        let targetPos: {x: number, y: number};
+        if (this.framesSinceMoved > 0) {
+            const bounds = this.getTheLocalPosition(line);
+            let targetPos: { x: number, y: number };
 
-        if (place === "origin") {
-            targetPos  = this.calculateDisplayCoordinates(bounds.start, bounds.startBounds);
+            if (place === "origin") {
+                targetPos = this.calculateDisplayCoordinates(bounds.start, bounds.startBounds);
+            } else {
+                targetPos = this.calculateDisplayCoordinates(bounds.end, bounds.endBounds);
+            }
+
+            pinSprite.x = targetPos.x + 6;
+            pinSprite.y = targetPos.y - 8;
+
+            this.framesSinceMoved--;
         }
-
-        else {
-            targetPos  = this.calculateDisplayCoordinates(bounds.end, bounds.endBounds);
-        }
-
-        pinSprite.x = targetPos.x + 6;
-        pinSprite.y = targetPos.y - 8;
     }
 
     private notesMoved(): boolean {

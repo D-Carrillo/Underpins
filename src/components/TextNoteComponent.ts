@@ -27,6 +27,7 @@ export class TextNoteComponent {
     }
 
     private MakeNoteGraphics(NoteGroup: Container<ContainerChild>, stage: Container<ContainerChild> ): Graphics {
+        //Let's get a sprite and make it more aesthetic, for the note;
         const NoteGraphics = new Graphics().rect(this.note.position.x, this.note.position.y, this.note.sizes.width, this.note.sizes.height).fill('fffc99');
         NoteGroup.addChild(NoteGraphics);
 
