@@ -64,7 +64,7 @@ test("Remove edges function actually removes the wanted edges", () => {
     const count = edges?.size;
 
     expect(count).toBe(0);
-})
+});
 
 test("Remove vertex function actually removes the wanted vertex", () => {
     let graph = new AdjacencyGraph();
@@ -80,4 +80,34 @@ test("Remove vertex function actually removes the wanted vertex", () => {
     expect(edges?.size).toBe(undefined);
 
     expect(graph.containsVertex("origin")).toBe(false);
-})
+});
+
+test( "getAllThreadIDsThatConnectTo a note ID should return a list of the correct ThreadIDs", () => {
+    let graph = new AdjacencyGraph();
+
+    graph.addEdge("target", "dest1");
+    graph.addEdge("origin", "target");
+    graph.addEdge("origin", "dest2");
+    graph.addEdge("target", "dest3");
+
+    const results = graph.getAllThreadIDsThatConnectTo("target");
+
+    expect(results.length).toBe(3);
+
+    expect(results).contains('target_dest1');
+    expect(results).contains('origin_target');
+    expect(results).contains('target_dest3');
+
+    expect(results).not.contains("origin_dest2");
+});
+
+test("getAllThreadIDThatConnectTo would return a [] if the Note does not form part of any thread", () => {
+    let graph = new AdjacencyGraph();
+
+    graph.addEdge("target", "dest1");
+    graph.addEdge("origin", "target");
+
+    const results = graph.getAllThreadIDsThatConnectTo("NotInTheGraph");
+
+    expect(results.length).toBe(0);
+});

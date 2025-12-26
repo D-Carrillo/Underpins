@@ -27,7 +27,7 @@ export class AdjacencyGraph {
         const matchingPairs: string[] = [];
 
         this.adjacentList.forEach((innerMap, firstKey) => {
-           if ( firstKey === targetID) {
+           if (firstKey === targetID) {
                innerMap.forEach((_, secondID) => {
                    matchingPairs.push(firstKey + '_' + secondID);
                });
