@@ -47,9 +47,8 @@ class ManagerForNotes{
 
     //Only for when we don't have JSON
     loadNotes(): BaseNote[] {
-        return [new TextNote("Type Here", 100, 200), new TextNote("Type here \n and here", 400, 100)];
+        return [new TextNote("Type Here", 100, 200), new TextNote("Type here \n and here", 400, 100), new TextNote("This is the third \n note", 400, 300)];
     }
-
 }
 
 export const NotesManager = new ManagerForNotes();

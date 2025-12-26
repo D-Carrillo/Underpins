@@ -14,6 +14,7 @@ class ManagerForThreads{
 
     private loadThreadGraph() {
         this.threadGraph.addEdge(NotesManager.getNotes()[0].id, NotesManager.getNotes()[1].id);
+        this.threadGraph.addEdge(NotesManager.getNotes()[2].id, NotesManager.getNotes()[1].id);
     }
 
     public getThreadGraph() {
@@ -25,15 +26,31 @@ class ManagerForThreads{
         return {originID: parts[0], destinationID: parts[1]};
     }
 
-    public deleteThread(threadID: string) {
+    public deleteThread(ID: string){
+        if (ID.includes('_')) {
+            this.deleteThreadWithThreadID(ID);
+        }
+
+        else{
+            this.deleteThreadsWithOnlyNoteID(ID);
+        }
+    }
+
+    public getDeletedThreads = ():{ID: string, thread: BaseThread}[] => this.deletedThreads;
+
+    private deleteThreadsWithOnlyNoteID(noteID: string) {
+        const threadID = this.threadGraph.getAllThreadIDsThatConnectTo(noteID);
+
+        threadID.forEach(ID => this.deleteThreadWithThreadID(ID));
+    }
+
+    private deleteThreadWithThreadID(threadID: string) {
         const parts = this.getSeparateIDs(threadID);
 
         this.deletedThreads.push({ID: threadID, thread: this.threadGraph.returnVertexMap(parts.originID)?.get(parts.destinationID)!});
 
         this.threadGraph.removeEdge(parts.originID, parts.destinationID);
     }
-
-    public getDeletedThreads = ():{ID: string, thread: BaseThread}[] => this.deletedThreads;
 }
 
 export const ThreadManager = new ManagerForThreads();

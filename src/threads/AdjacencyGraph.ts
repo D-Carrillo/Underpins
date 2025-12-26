@@ -23,6 +23,26 @@ export class AdjacencyGraph {
         this.adjacentList.get(vertexID)?.set(destinationVertexID, new BaseThread(vertexID + '_' + destinationVertexID));
     }
 
+    public getAllThreadIDsThatConnectTo(targetID: string): string[] {
+        const matchingPairs: string[] = [];
+
+        this.adjacentList.forEach((innerMap, firstKey) => {
+           if ( firstKey === targetID) {
+               innerMap.forEach((_, secondID) => {
+                   matchingPairs.push(firstKey + '_' + secondID);
+               });
+           }
+
+           else {
+               if (innerMap.has(targetID)){
+                    matchingPairs.push(firstKey + '_' + targetID);
+               }
+           }
+        });
+
+        return matchingPairs;
+    }
+
     public removeEdge = (vertexID: string, destinationID: string) => this.adjacentList.get(vertexID)?.delete(destinationID);
 
     public removeVertex(vertexID: string) {

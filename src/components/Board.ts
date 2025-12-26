@@ -47,6 +47,7 @@ export class Board {
 
                 change.removed.forEach((note) => {
                     const visualNote = this.noteMap.get(note.id);
+                    ThreadManager.deleteThread(note.id);
 
                     if(visualNote) {
                         visualNote.destroy({children: true});
