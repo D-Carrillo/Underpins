@@ -8,6 +8,7 @@ import {BoardMenu} from "../menus/BoardMenu.ts";
 import {ThreadComponent} from "./ThreadComponent.ts";
 import { ThreadManager } from "../managers/ThreadManager.ts";
 import {BaseThread} from "../threads/BaseThread.ts";
+import {BoardManager} from "../managers/BoardManager.ts";
 
 export class Board {
     private readonly stage: Container<ContainerChild>
@@ -26,6 +27,9 @@ export class Board {
         this.loadThreads();
         this.observerFunctionForNotes();
         this.observerFunctionForThreads();
+
+        BoardManager.setNoteMap(this.noteMap);
+        BoardManager.setStage(this.stage);
 
         // app.renderer.on('resize', () => this.OnResize());
     }
@@ -60,11 +64,12 @@ export class Board {
     }
 
     private observerFunctionForThreads() {
-        reaction(() => ThreadManager.getDeletedThreads().length, (_, oldLength) => {
-            const newlyDeleted = ThreadManager.getDeletedThreads().slice(oldLength);
+        reaction(() => ThreadManager.getDeletedThreads().size, (_, oldLength) => {
+            const newlyDeletedID = Array.from(ThreadManager.getDeletedThreads()).slice(oldLength);
 
-            newlyDeleted.forEach((thread) => {
-                const visualThread = this.threadMap.get(thread.ID);
+            newlyDeletedID.forEach((thread) => {
+                const threadID= thread[0];
+                const visualThread = this.threadMap.get(threadID);
 
                 if (visualThread) {
                     visualThread.destroy({
@@ -72,7 +77,7 @@ export class Board {
                         texture: false,
                     });
 
-                    this.threadMap.delete(thread.ID)
+                    this.threadMap.delete(threadID)
                 }
             });
         });

@@ -17,6 +17,10 @@ class ManagerForThreads{
         this.threadGraph.addEdge(NotesManager.getNotes()[2].id, NotesManager.getNotes()[1].id);
     }
 
+    public addThread(originID: string, destinationID: string) {
+      this.threadGraph.addEdge(originID, destinationID);
+    }
+
     public getThreadGraph() {
         return this.threadGraph;
     }

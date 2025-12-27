@@ -1,15 +1,23 @@
 import { NotesManager } from "../managers/NoteManager.ts";
+import {HandThread} from "../threads/handThread.ts";
 
 export function NoteMenu(event: MouseEvent, menu: HTMLDivElement, id: string) {
-    const button = document.createElement("button");
-    button.textContent = "Delete Text Note";
+    const deleteNoteButton = document.createElement("button");
+    deleteNoteButton.textContent = "Delete Text Note";
 
-    console.log(event);
+    const createThreadButton = document.createElement("button");
+    createThreadButton.textContent = "Create a Thread";
 
-    button.onclick = () => {
+    deleteNoteButton.onclick = () => {
         NotesManager.deleteNote(id);
         menu.remove();
     };
 
-    menu.appendChild(button);
+    createThreadButton.onclick = () => {
+        HandThread.linkToHand(event, id);
+        menu.remove();
+    }
+
+    menu.appendChild(deleteNoteButton);
+    menu.appendChild(createThreadButton);
 }

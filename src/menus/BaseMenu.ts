@@ -8,12 +8,15 @@ export function useContextMenu(event: MouseEvent,  wantedMenu: MenuCreator, wild
     const menu = document.createElement("div");
     menu.className = "custom-menu";
     menu.style.position = "absolute";
+    menu.style.display = 'flex';
+    menu.style.flexDirection = "column";
     menu.style.top = `${event.pageY}px`;
     menu.style.left = `${event.pageX}px`;
 
     wantedMenu(event, menu, wildcard);
 
     document.body.appendChild(menu);
+
 
     const closeMenu = () => menu.remove();
     const escClose = (e: KeyboardEvent) => e.key === "Escape" && closeMenu();
