@@ -59,11 +59,24 @@ test("Remove edges function actually removes the wanted edges", () => {
 
     const edges = graph.returnVertexMap(origin);
 
-    expect(edges?.size).toBe(0);
+    expect(edges).not.toBeDefined();
+});
 
-    const count = edges?.size;
+test("Remove edges function only removes the wanted edges", () => {
+    let graph = new AdjacencyGraph();
+    const origin = "VertexID";
+    const dest = "DestinationID"
+    const dest2 = "DestinationID2";
 
-    expect(count).toBe(0);
+    graph.addEdge(origin, dest);
+    graph.addEdge(origin, dest2);
+
+    graph.removeEdge(origin, dest);
+
+    const edges = graph.returnVertexMap(origin);
+
+    expect(edges?.size).toBe(1);
+    expect(edges?.has(dest2)).toBe(true);
 });
 
 test("Remove vertex function actually removes the wanted vertex", () => {

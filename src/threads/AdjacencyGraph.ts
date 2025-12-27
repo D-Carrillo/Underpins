@@ -43,7 +43,13 @@ export class AdjacencyGraph {
         return matchingPairs;
     }
 
-    public removeEdge = (vertexID: string, destinationID: string) => this.adjacentList.get(vertexID)?.delete(destinationID);
+    public removeEdge = (vertexID: string, destinationID: string) => {
+        this.adjacentList.get(vertexID)?.delete(destinationID)
+
+        if(this.adjacentList.get(vertexID)?.size === 0) {
+            this.removeVertex(vertexID);
+        }
+    };
 
     public removeVertex(vertexID: string) {
         this.adjacentList.delete(vertexID);
@@ -54,4 +60,6 @@ export class AdjacencyGraph {
     public containsVertex = (vertexID: string ): boolean => this.adjacentList.has(vertexID);
 
     public returnVertexMap = (vertexID: string)  => this.adjacentList.get(vertexID);
+
+    public destroyGraph= () => this.adjacentList.clear();
 }

@@ -5,7 +5,7 @@ import {BaseThread} from "../threads/BaseThread.ts";
 
 class ManagerForThreads{
     private threadGraph = new AdjacencyGraph();
-    private deletedThreads: {ID: string, thread: BaseThread}[] = [];
+    private deletedThreads = new Map<string, BaseThread>();
 
     constructor() {
         makeAutoObservable(this);
@@ -22,7 +22,12 @@ class ManagerForThreads{
     }
 
     public getSeparateIDs(threadID: string): {originID: string, destinationID: string} {
-        const parts = threadID.split("_");
+        const parts = threadID.split('_');
+
+        if(parts.includes('')) {
+            throw Error("No Origin or Destination in the thread");
+        }
+
         return {originID: parts[0], destinationID: parts[1]};
     }
 
@@ -36,7 +41,7 @@ class ManagerForThreads{
         }
     }
 
-    public getDeletedThreads = ():{ID: string, thread: BaseThread}[] => this.deletedThreads;
+    public getDeletedThreads = (): Map<string, BaseThread> => this.deletedThreads;
 
     private deleteThreadsWithOnlyNoteID(noteID: string) {
         const threadID = this.threadGraph.getAllThreadIDsThatConnectTo(noteID);
@@ -47,9 +52,17 @@ class ManagerForThreads{
     private deleteThreadWithThreadID(threadID: string) {
         const parts = this.getSeparateIDs(threadID);
 
-        this.deletedThreads.push({ID: threadID, thread: this.threadGraph.returnVertexMap(parts.originID)?.get(parts.destinationID)!});
+        this.deletedThreads.set(threadID,  this.threadGraph.returnVertexMap(parts.originID)?.get(parts.destinationID)!);
 
         this.threadGraph.removeEdge(parts.originID, parts.destinationID);
+    }
+
+    //This class is only for testing
+    public reset() {
+        this.threadGraph.destroyGraph();
+        this.deletedThreads.clear();
+
+        this.loadThreadGraph();
     }
 }
 
