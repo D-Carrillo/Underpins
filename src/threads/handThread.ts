@@ -1,21 +1,50 @@
-import {Graphics} from "pixi.js";
+import {FederatedPointerEvent, Graphics} from "pixi.js";
 import {ThreadComponent} from "../components/ThreadComponent.ts";
 import {BoardManager} from "../managers/BoardManager.ts";
 import {BaseThread} from "./BaseThread.ts";
+import {ThreadManager} from "../managers/ThreadManager.ts";
 
 export class HandThread {
+    private static activeHandler: ((event: any) => void) | null = null;
+
     public static linkToHand(event: MouseEvent, noteID: string) {
+        const stage = BoardManager.getStage();
+
+        if (stage === null) {
+            throw Error("The BoardManager does not have required stage");
+        }
+
+        this.activeHandler = (event: FederatedPointerEvent) => {
+            mouseCircle.x = event.global.x;
+            mouseCircle.y = event.global.y;
+        }
+
         const mouseCircle = new Graphics().circle(0, 0, 10).fill(0x000000);
-        BoardManager.getStage()!.addChild(mouseCircle);
+        stage.addChild(mouseCircle);
 
         mouseCircle.x = event.x;
         mouseCircle.y = event.y;
 
-        new ThreadComponent(BoardManager.getNote(noteID)!, mouseCircle, new BaseThread(noteID + "_Fake")).makeThreadWithPins(BoardManager.getStage()!);
+        const unlinkedThread = new ThreadComponent(BoardManager.getNote(noteID)!, mouseCircle, new BaseThread(noteID + "_Fake")).makeThreadWithPins(stage);
 
-        BoardManager.getStage()!.on('globalmousemove', (event) => {
-            mouseCircle.x = event.global.x;
-            mouseCircle.y = event.global.y;
+        stage.on('globalmousemove', this.activeHandler);
+
+        stage.once('pointertap', () => {
+            this.stopMouseMove(mouseCircle);
+            ThreadManager.destroyVisualThread(unlinkedThread, stage);
         });
+    }
+
+    private static stopMouseMove(mouseCircle: Graphics) {
+        const stage = BoardManager.getStage();
+
+        if(stage && this.activeHandler) {
+            stage.off("globalmousemove", this.activeHandler);
+            this.activeHandler = null;
+        }
+
+        if(mouseCircle) {
+            mouseCircle.destroy({children: true});
+        }
     }
 }

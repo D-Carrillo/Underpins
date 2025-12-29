@@ -2,6 +2,7 @@ import {makeAutoObservable} from "mobx";
 import {AdjacencyGraph} from "../threads/AdjacencyGraph.ts";
 import {NotesManager} from "./NoteManager.ts";
 import {BaseThread} from "../threads/BaseThread.ts";
+import {Container, ContainerChild} from "pixi.js";
 
 class ManagerForThreads{
     private threadGraph = new AdjacencyGraph();
@@ -65,8 +66,16 @@ class ManagerForThreads{
     public reset() {
         this.threadGraph.destroyGraph();
         this.deletedThreads.clear();
-
         this.loadThreadGraph();
+    }
+
+    public destroyVisualThread(threadVisual: Container<ContainerChild>, stage: Container<ContainerChild>) {
+        stage.removeChild(threadVisual);
+
+        threadVisual.destroy({
+            children: true,
+            texture: false,
+        });
     }
 }
 

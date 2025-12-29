@@ -14,7 +14,6 @@ export function NoteMenu(_: MouseEvent, menu: HTMLDivElement, id: string) {
     };
 
     createThreadButton.onclick = (event) => {
-
         HandThread.linkToHand(event, id);
         menu.remove();
     }

@@ -55,7 +55,6 @@ export class Board {
 
                     if(visualNote) {
                         visualNote.destroy({children: true});
-
                         this.noteMap.delete(note.id);
                     }
                 });
@@ -72,11 +71,7 @@ export class Board {
                 const visualThread = this.threadMap.get(threadID);
 
                 if (visualThread) {
-                    visualThread.destroy({
-                        children: true,
-                        texture: false,
-                    });
-
+                    ThreadManager.destroyVisualThread(visualThread, this.stage);
                     this.threadMap.delete(threadID)
                 }
             });
