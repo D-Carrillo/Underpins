@@ -3,6 +3,7 @@ import {ThreadComponent} from "../components/ThreadComponent.ts";
 import {BoardManager} from "../managers/BoardManager.ts";
 import {BaseThread} from "./BaseThread.ts";
 import {ThreadManager} from "../managers/ThreadManager.ts";
+import {NotesManager} from "../managers/NoteManager.ts";
 
 export class HandThread {
     private static activeHandler: ((event: any) => void) | null = null;
@@ -13,6 +14,8 @@ export class HandThread {
         if (stage === null) {
             throw Error("The BoardManager does not have required stage");
         }
+
+        NotesManager.notesLightUpForSelection(BoardManager.getNoteMap(), noteID);
 
         this.activeHandler = (event: FederatedPointerEvent) => {
             mouseCircle.x = event.global.x;

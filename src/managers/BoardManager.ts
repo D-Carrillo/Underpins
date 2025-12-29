@@ -16,6 +16,10 @@ class ManagerForBoards {
         return this.noteMap?.get(id);
     }
 
+    public getNoteMap(): Map<string, Container> {
+        return this.noteMap!;
+    }
+
     public getStage(): Container<ContainerChild> | null{
         return this.stage;
     }
