@@ -35,6 +35,7 @@ export class HandThread {
         stage.once('pointertap', () => {
             this.stopMouseMove(mouseCircle);
             ThreadManager.destroyVisualThread(unlinkedThread, stage);
+            NotesManager.notesStopLightingUp(BoardManager.getNoteMap(), noteID)
         });
     }
 

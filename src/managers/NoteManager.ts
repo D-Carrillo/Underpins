@@ -67,6 +67,16 @@ class ManagerForNotes{
            }
         });
     }
+
+    public notesStopLightingUp(noteMap: Map<string, Container>, originNoteID: string) {
+        noteMap.forEach((visual, ID) => {
+            if(originNoteID !== ID) {
+                const glowChild = visual.getChildAt(0);
+                visual.removeChild(glowChild);
+                glowChild.destroy({children: true});
+            }
+        });
+    }
 }
 
 export const NotesManager = new ManagerForNotes();
