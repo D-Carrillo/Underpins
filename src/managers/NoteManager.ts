@@ -2,6 +2,7 @@ import {TextNote} from "../notes/TextNote.ts";
 import NoteFactory from "../factories/NoteFactory.ts";
 import { makeAutoObservable } from "mobx";
 import {BaseNote} from "../notes/BaseNote.ts";
+import {Container, ContainerChild} from "pixi.js";
 
 class ManagerForNotes{
     private notes: BaseNote[];
@@ -48,6 +49,10 @@ class ManagerForNotes{
     //Only for when we don't have JSON
     loadNotes(): BaseNote[] {
         return [new TextNote("Type Here", 100, 200), new TextNote("Type here \n and here", 400, 100), new TextNote("This is the third \n note", 400, 300)];
+    }
+
+    public destroyVisualNote(noteVisual: Container<ContainerChild>) {
+        noteVisual.destroy({children: true});
     }
 }
 

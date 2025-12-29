@@ -54,7 +54,7 @@ export class Board {
                     ThreadManager.deleteThread(note.id);
 
                     if(visualNote) {
-                        visualNote.destroy({children: true});
+                        NotesManager.destroyVisualNote(visualNote);
                         this.noteMap.delete(note.id);
                     }
                 });

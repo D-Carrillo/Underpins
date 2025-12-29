@@ -51,6 +51,10 @@ class ManagerForThreads{
     private deleteThreadsWithOnlyNoteID(noteID: string) {
         const threadID = this.threadGraph.getAllThreadIDsThatConnectTo(noteID);
 
+        if (threadID.length <= 0) {
+            return;
+        }
+
         threadID.forEach(ID => this.deleteThreadWithThreadID(ID));
     }
 
