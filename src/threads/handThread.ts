@@ -36,15 +36,16 @@ export class HandThread {
             this.stopMouseMove(mouseCircle);
             ThreadManager.destroyVisualThread(unlinkedThread, stage);
             NotesManager.notesStopLightingUp(BoardManager.getNoteMap(), noteID);
-            console.log(event.client);
+
+            const clickPointer = event.global;
 
             BoardManager.getNoteMap().forEach((visual, ID) => {
-                const bound = visual.getLocalBounds();
-                if((event.clientX > bound.x  &&  event.clientX < bound.width + bound.x) && (event.clientY > bound.y  &&  event.clientY < bound.height + bound.y)) {
+                const bounds = visual.getBounds();
+
+                if(bounds.containsPoint(clickPointer.x, clickPointer.y)) {
                     ThreadManager.addThread(noteID, ID);
                 }
             });
-
         });
     }
 

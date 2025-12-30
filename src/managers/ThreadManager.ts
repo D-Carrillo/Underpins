@@ -7,7 +7,7 @@ import {Container, ContainerChild} from "pixi.js";
 class ManagerForThreads{
     private threadGraph = new AdjacencyGraph();
     private deletedThreads = new Map<string, BaseThread>();
-    private recentlyAdded : string[] = [] ;
+    private recentlyAdded : string[] = [];
 
     constructor() {
         makeAutoObservable(this);
