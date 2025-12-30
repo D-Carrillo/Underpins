@@ -18,7 +18,7 @@ export class AdjacencyGraph {
             this.addVertex(vertexID);
         }
 
-        if (this.adjacentList.get(vertexID)?.has(destinationVertexID)){ return }
+        if (this.adjacentList.get(vertexID)?.has(destinationVertexID) || this.adjacentList.get(destinationVertexID)?.has(vertexID)){ return }
 
         this.adjacentList.get(vertexID)?.set(destinationVertexID, new BaseThread(vertexID + '_' + destinationVertexID));
     }
