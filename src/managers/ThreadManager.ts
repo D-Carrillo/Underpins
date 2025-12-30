@@ -6,7 +6,7 @@ import {Container, ContainerChild} from "pixi.js";
 
 class ManagerForThreads{
     private threadGraph = new AdjacencyGraph();
-    private deletedThreads = new Map<string, BaseThread>();
+    private deletedThreads : {ID: string, threadType: BaseThread}[] = [];
     private recentlyAdded : string[] = [];
 
     constructor() {
@@ -48,7 +48,7 @@ class ManagerForThreads{
         }
     }
 
-    public getDeletedThreads = (): Map<string, BaseThread> => this.deletedThreads;
+    public getDeletedThreads = (): {ID: string, threadType: BaseThread}[] => this.deletedThreads;
 
     public getRecentlyAddedThreads = (): string[] => this.recentlyAdded;
 
@@ -65,7 +65,7 @@ class ManagerForThreads{
     private deleteThreadWithThreadID(threadID: string) {
         const parts = this.getSeparateIDs(threadID);
 
-        this.deletedThreads.set(threadID,  this.threadGraph.returnVertexMap(parts.originID)?.get(parts.destinationID)!);
+        this.deletedThreads.push({ID: threadID,  threadType: this.threadGraph.returnVertexMap(parts.originID)?.get(parts.destinationID)!});
 
         this.threadGraph.removeEdge(parts.originID, parts.destinationID);
     }
@@ -73,7 +73,7 @@ class ManagerForThreads{
     //This class is only for testing
     public reset() {
         this.threadGraph.destroyGraph();
-        this.deletedThreads.clear();
+        this.deletedThreads.length = 0;
         this.loadThreadGraph();
     }
 

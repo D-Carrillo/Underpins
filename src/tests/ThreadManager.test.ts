@@ -44,7 +44,7 @@ describe("Deletion tests", () => {
         ThreadManager.deleteThread(threadID);
 
         expect(ThreadManager.getThreadGraph().getVertexesAmount()).toBe(numOfThreads - 1);
-        expect(ThreadManager.getDeletedThreads().has(threadID));
+        expect(ThreadManager.getDeletedThreads().some(deletedThread => deletedThread.ID === threadID));
     });
 
     test("deleteThreadWithThreadID deletes the wanted thread", () => {
@@ -53,7 +53,7 @@ describe("Deletion tests", () => {
         ThreadManager.deleteThread(threadID);
 
         expect(ThreadManager.getThreadGraph().containsVertex(NotesManager.getNotes()[0].id)).toBe(false);
-        expect(ThreadManager.getDeletedThreads().has(threadID));
+        expect(ThreadManager.getDeletedThreads().some(deletedThread => deletedThread.ID === threadID));
     });
 
     test("deleteThread with only noteID deletes all of thread that are linked to that note", () => {
@@ -62,15 +62,15 @@ describe("Deletion tests", () => {
         ThreadManager.deleteThread(NotesManager.getNotes()[1].id);
 
         expect(ThreadManager.getThreadGraph().getVertexesAmount()).toBe(numOfThreads - 2);
-        expect(ThreadManager.getDeletedThreads().size).toBe(2);
+        expect(ThreadManager.getDeletedThreads().length).toBe(2);
     });
 
     test("deleteThread with only noteID delete all of the threads that contain that note", () => {
         ThreadManager.deleteThread(NotesManager.getNotes()[1].id);
 
         expect(ThreadManager.getThreadGraph().getAllThreadIDsThatConnectTo(NotesManager.getNotes()[1].id)).toStrictEqual([]);
-        expect(ThreadManager.getDeletedThreads().has(NotesManager.getNotes()[0].id + '_' + NotesManager.getNotes()[1].id));
-        expect(ThreadManager.getDeletedThreads().has(NotesManager.getNotes()[2].id + '_' + NotesManager.getNotes()[1].id));
+        expect(ThreadManager.getDeletedThreads().some(deletedThread => deletedThread.ID === NotesManager.getNotes()[0].id + '_' + NotesManager.getNotes()[1].id));
+        expect(ThreadManager.getDeletedThreads().some(deletedThread => deletedThread.ID === NotesManager.getNotes()[2].id + '_' + NotesManager.getNotes()[1].id));
 
     });
 });
