@@ -37,6 +37,14 @@ export class HandThread {
             ThreadManager.destroyVisualThread(unlinkedThread, stage);
             NotesManager.notesStopLightingUp(BoardManager.getNoteMap(), noteID);
             console.log(event.client);
+
+            BoardManager.getNoteMap().forEach((visual, ID) => {
+                const bound = visual.getLocalBounds();
+                if((event.clientX > bound.x  &&  event.clientX < bound.width + bound.x) && (event.clientY > bound.y  &&  event.clientY < bound.height + bound.y)) {
+                    ThreadManager.addThread(noteID, ID);
+                }
+            });
+
         });
     }
 

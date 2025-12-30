@@ -7,6 +7,7 @@ import {Container, ContainerChild} from "pixi.js";
 class ManagerForThreads{
     private threadGraph = new AdjacencyGraph();
     private deletedThreads = new Map<string, BaseThread>();
+    private recentlyAdded : string[] = [] ;
 
     constructor() {
         makeAutoObservable(this);
@@ -20,6 +21,7 @@ class ManagerForThreads{
 
     public addThread(originID: string, destinationID: string) {
       this.threadGraph.addEdge(originID, destinationID);
+      this.recentlyAdded.push(originID + '_' + destinationID);
     }
 
     public getThreadGraph() {
@@ -47,6 +49,8 @@ class ManagerForThreads{
     }
 
     public getDeletedThreads = (): Map<string, BaseThread> => this.deletedThreads;
+
+    public getRecentlyAddedThreads = (): string[] => this.recentlyAdded;
 
     private deleteThreadsWithOnlyNoteID(noteID: string) {
         const threadID = this.threadGraph.getAllThreadIDsThatConnectTo(noteID);

@@ -19,6 +19,8 @@ export class TextNoteComponent {
     public makeNote(stage: Container<ContainerChild>): Container {
         const NoteGroup = new Container();
 
+        NoteGroup.label = this.note.id;
+
         this.MakeNoteGraphics(NoteGroup, stage);
 
         stage.addChild(NoteGroup);
@@ -64,7 +66,7 @@ export class TextNoteComponent {
     }
 
     private makeDraggable(target: Container, stage: Container<ContainerChild>, text: Text) {
-        target.eventMode = 'dynamic';
+        target.eventMode = 'static';
         target.cursor = 'pointer';
         text.eventMode = 'static';
         text.cursor = 'text';

@@ -23,6 +23,7 @@ export class AdjacencyGraph {
         this.adjacentList.get(vertexID)?.set(destinationVertexID, new BaseThread(vertexID + '_' + destinationVertexID));
     }
 
+
     public getAllThreadIDsThatConnectTo(targetID: string): string[] {
         const matchingPairs: string[] = [];
 
