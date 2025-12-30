@@ -49,7 +49,7 @@ export class TextNoteComponent {
             fill: 0x000000,
             padding: 1,
             wordWrap: true,
-            wordWrapWidth: this.note.sizes.width,
+            wordWrapWidth: this.note.sizes.width - 25,
             breakWords: true,
         })
 
@@ -59,8 +59,8 @@ export class TextNoteComponent {
             resolution: window.devicePixelRatio,
         });
 
-        text.x = this.note.position.x;
-        text.y = this.note.position.y;
+        text.x = this.note.position.x + 17;
+        text.y = this.note.position.y + 12;
 
         return text
     }
