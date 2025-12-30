@@ -59,7 +59,7 @@ class ManagerForNotes{
         //Don't really like the blur, but it can be fixed on the aesthetication process
         noteMap.forEach((visual, ID) => {
            if (originNoteID !== ID) {
-               const glow = new Graphics().rect(visual.getBounds().x, visual.getBounds().y, visual.width, visual.height).fill("80400B");
+               const glow = new Graphics().rect(visual.getLocalBounds().x, visual.getLocalBounds().y, visual.width, visual.height).fill("80400B");
 
                glow.filters = new BlurFilter({strength: 15});
 

@@ -1,10 +1,10 @@
 import {Container, ContainerChild} from "pixi.js";
 
 class ManagerForBoards {
-    private noteMap: Map<string, Container> | null = null;
+    private noteMap: (() => Map<string, Container>)  | null = null;
     private stage: Container<ContainerChild> | null = null;
 
-    public setNoteMap(map: Map<string, Container>) {
+    public setNoteMap(map: (() => Map<string, Container>)) {
         this.noteMap = map;
     }
 
@@ -13,11 +13,15 @@ class ManagerForBoards {
     }
 
     public getNote(id: string): Container | undefined {
-        return this.noteMap?.get(id);
+        return this.noteMap!().get(id);
     }
 
     public getNoteMap(): Map<string, Container> {
-        return this.noteMap!;
+        if(!this.noteMap){
+            throw Error("NoteMap getter not set");
+        }
+
+        return this.noteMap();
     }
 
     public getStage(): Container<ContainerChild> | null{

@@ -28,7 +28,7 @@ export class Board {
         this.observerFunctionForNotes();
         this.observerFunctionForThreads();
 
-        BoardManager.setNoteMap(this.noteMap);
+        BoardManager.setNoteMap(() => this.noteMap);
         BoardManager.setStage(this.stage);
 
         // app.renderer.on('resize', () => this.OnResize());
