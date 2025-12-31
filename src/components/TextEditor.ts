@@ -6,6 +6,7 @@ export class TextEditor {
     private textarea: HTMLTextAreaElement;
     private pixiText: Text;
     private note: TextNote;
+    private blinkInterval: number = 0;
 
     constructor(pixiText: Text, note: TextNote) {
         this.pixiText = pixiText;
@@ -41,6 +42,8 @@ export class TextEditor {
         this.caret.visible = true;
         this.updateCaretPosition();
         this.textarea.focus();
+
+        this.blinkInterval = setInterval(() => {this.caret.visible = !this.caret.visible}, 500);
     }
 
     private setupEventListeners(): void {
@@ -114,6 +117,8 @@ export class TextEditor {
     }
 
     private updateCaretPosition(): void {
+        this.caret.visible = true;
+
         const style = this.pixiText.style;
         const cursorPointer = this.textarea?.selectionStart ?? this.pixiText.text.length;
         const text = this.pixiText.text.substring(0, cursorPointer) + "|";
@@ -136,6 +141,10 @@ export class TextEditor {
         this.note.updateContent(this.textarea.value);
         this.pixiText.text = this.note.content;
         this.caret.visible = false;
+
+        if (this.blinkInterval !== 0) clearInterval(this.blinkInterval);
+
+        this.caret.destroy({children: true});
 
         if (this.textarea.parentNode) {
             document.body.removeChild(this.textarea);

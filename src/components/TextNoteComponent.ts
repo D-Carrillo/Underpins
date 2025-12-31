@@ -130,6 +130,7 @@ export class TextNoteComponent {
             }, 0);
 
             this.editing.close();
+            this.editing = null;
         }
     }
 
