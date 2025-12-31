@@ -7,23 +7,35 @@ import {
     TextStyle
 } from "pixi.js";
 import {TextNote as TextN} from "../notes/TextNote.ts";
-import {openEditor} from "./TextEditor.ts";
+import {TextEditor} from "./TextEditor.ts";
 import {useContextMenu} from "../menus/BaseMenu.ts";
 import {NoteMenu} from "../menus/NoteMenu.ts";
+import {BoardManager} from "../managers/BoardManager.ts";
 
 export class TextNoteComponent {
     private readonly note: TextN
+    private editing: TextEditor | null = null;
+    private NoteGroup: Container;
+
+    private closeOnBlur = (event: FederatedPointerEvent) => {
+        const bounds = this.NoteGroup.getBounds();
+
+        if (!bounds.containsPoint(event.globalX, event.globalY)) {
+            console.log("The one got click");
+            this.closeEditor();
+        }
+    }
 
     constructor(concrete_note: TextN) {
         this.note = concrete_note;
+        this.NoteGroup = new Container();
     }
 
     public makeNote(stage: Container<ContainerChild>): Container {
-        const NoteGroup = new Container();
-        NoteGroup.label = this.note.id;
-        this.MakeNoteGraphics(NoteGroup, stage);
-        stage.addChild(NoteGroup);
-        return NoteGroup;
+        this.NoteGroup.label = this.note.id;
+        this.MakeNoteGraphics(this.NoteGroup, stage);
+        stage.addChild(this.NoteGroup);
+        return this.NoteGroup;
     }
 
     private MakeNoteGraphics(NoteGroup: Container<ContainerChild>, stage: Container<ContainerChild>): Graphics {
@@ -71,14 +83,14 @@ export class TextNoteComponent {
         text.eventMode = 'static';
         text.cursor = 'pointer';
 
-        target.on('pointerdown', onDragStart);
-
         let dragTarget: Graphics | null = null;
         let offset = {x: 0, y: 0};
 
-        function onDragStart(event: FederatedPointerEvent) {
+        const onDragStart = (event: FederatedPointerEvent) => {
             dragTarget = event.currentTarget as Graphics;
             dragTarget.alpha = 0.7;
+
+            this.closeEditor();
 
             const localPos = dragTarget.parent!.toLocal(event.global);
             offset.x = target.x - localPos.x;
@@ -99,7 +111,7 @@ export class TextNoteComponent {
             if (dragTarget) {
                 const distance = Math.sqrt(Math.pow(dragTarget.x - this.note.position.x, 2) + Math.pow(dragTarget.y - this.note.position.y, 2));
 
-                distance > 5 ? this.note.changeCoordinate(dragTarget.x, dragTarget.y) : openEditor(text, this.note);
+                distance > 5 ? this.note.changeCoordinate(dragTarget.x, dragTarget.y) : this.getEditing(text);
 
                 stage.off('pointermove', onDragMove);
                 dragTarget.alpha = 1;
@@ -107,13 +119,42 @@ export class TextNoteComponent {
             }
         }
 
+        target.on('pointerdown', onDragStart);
         target.on('pointerup', onDragEnd);
         target.on('pointerupoutside', onDragEnd);
+
+        stage.on('pointerdown', this.closeOnBlur);
+    }
+
+    private closeEditor() {
+        if (this.editing !== null) {
+
+            setTimeout(() => {
+                BoardManager.getStage()!.off('pointerdown', this.closeOnBlur);
+            }, 0);
+
+            this.editing.close();
+        }
     }
 
     private makeEditable(target: Container) {
         target.on("rightclick", (event) => {
+            this.closeEditor();
             useContextMenu(event.nativeEvent as MouseEvent, NoteMenu, this.note.id);
         });
+    }
+
+    private getEditing(text: Text) {
+        if (this.editing === null) {
+            this.editing = new TextEditor(text, this.note);
+            this.editing.open();
+        }
+
+        else {
+            this.editing.close();
+            this.editing = null;
+            this.editing = new TextEditor(text, this.note);
+            this.editing.open();
+        }
     }
 }

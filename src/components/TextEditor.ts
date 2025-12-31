@@ -1,69 +1,86 @@
-import {CanvasTextMetrics, Text, Graphics} from "pixi.js";
+import { CanvasTextMetrics, Text, Graphics, FederatedPointerEvent } from "pixi.js";
 import { TextNote } from "../notes/TextNote.ts";
 
-const caret = new Graphics();
+export class TextEditor {
+    private caret: Graphics;
+    private textarea: HTMLTextAreaElement;
+    private pixiText: Text;
+    private note: TextNote;
 
-function initCaret(caret: Graphics) {
-    caret.fill(0x000000);
-    caret.rect(0, 0, 1, 20);
-    caret.visible = false;
-}
+    constructor(pixiText: Text, note: TextNote) {
+        this.pixiText = pixiText;
+        this.note = note;
 
-export function openEditor(pixiText: Text, note: TextNote) {
-    const textarea = document.createElement('textarea');
+        this.caret = new Graphics();
+        this.initCaret();
 
-    textarea.value = note.content;
-    textarea.style.position = 'absolute';
-    textarea.style.left = '-9999px';
-    textarea.style.top = '0px';
-    textarea.style.width = '0px';
-    textarea.style.height = '0px';
+        this.textarea = document.createElement('textarea');
+        this.initTextarea(note);
 
-    document.body.appendChild(textarea);
+        document.body.appendChild(this.textarea);
+        pixiText.parent!.addChild(this.caret);
 
-    initCaret(caret);
-    caret.visible = true;
-    if (pixiText.parent) pixiText.parent!.addChild(caret);
-    updateCaretPosition(pixiText);
-    textarea.focus();
-
-    const closeEditor = () => {
-        note.updateContent(textarea.value);
-        pixiText.text = note.content;
-        caret.visible = false;
-        document.body.removeChild(textarea);
-        console.log('Got closed');
+        this.setupEventListeners();
     }
 
-    textarea.addEventListener('input', (event) => {
+    private initTextarea(note: TextNote) {
+        this.textarea.value = note.content;
+        this.textarea.style.position = 'absolute';
+        this.textarea.style.left = '-9999px';
+        this.textarea.style.top = '0px';
+        this.textarea.style.width = '0px';
+        this.textarea.style.height = '0px';
+    }
+
+    private initCaret() {
+        this.caret.rect(0, 0, 2, 20).fill(0x000000);
+        this.caret.visible = false;
+    }
+
+    public open(): void {
+        this.caret.visible = true;
+        this.updateCaretPosition();
+        this.textarea.focus();
+    }
+
+    private setupEventListeners(): void {
+        this.textarea.addEventListener('input', this.handleInput);
+        this.textarea.addEventListener('keydown', this.handleKeyDown);
+        this.pixiText.on("pointerdown", this.handlePointerDown);
+    }
+
+    private handleInput = (event: Event): void => {
         const target = event.target as HTMLTextAreaElement;
-        if (pixiText) {
-            pixiText.text = target.value;
-            updateCaretPosition(pixiText);
+        if (this.pixiText) {
+            this.pixiText.text = target.value;
+            this.updateCaretPosition();
         }
-    });
+    };
 
-    textarea.addEventListener('keydown', (e) => {
+    private handleKeyDown = (e: KeyboardEvent): void => {
         if (e.key === 'Escape') {
-            textarea.blur();
-            closeEditor();
+            this.textarea.blur();
+            this.close();
         }
 
-        setTimeout(() => updateCaretPosition(pixiText), 0);
-    });
+        setTimeout(() => this.updateCaretPosition(), 0);
+    };
 
-    pixiText.on('pointerdown', (event) => {
-        event.stopPropagation();
+    private handlePointerDown = (event: FederatedPointerEvent): void => {
         event.preventDefault();
+        event.stopPropagation();
 
-        const style = pixiText.style;
-        const text = pixiText.text;
+        this.calculateClosestIndex(event);
+    };
 
-        const localPoint = pixiText.toLocal(event.global);
+    private calculateClosestIndex(event: FederatedPointerEvent): void {
+        const style = this.pixiText.style;
+        const text = this.pixiText.text;
+        const localPoint = this.pixiText.toLocal(event.global);
 
         const anchorOffsetXY = {
-            x: pixiText.anchor.x * pixiText.width,
-            y: pixiText.anchor.y * pixiText.height
+            x: this.pixiText.anchor.x * this.pixiText.width,
+            y: this.pixiText.anchor.y * this.pixiText.height
         };
 
         let closestIndex = 0;
@@ -91,32 +108,39 @@ export function openEditor(pixiText: Text, note: TextNote) {
             }
         }
 
-        textarea.selectionStart = textarea.selectionEnd = closestIndex;
-        textarea.focus();
-        updateCaretPosition(pixiText);
-    });
-}
+        this.textarea.selectionStart = this.textarea.selectionEnd = closestIndex;
+        this.textarea.focus();
+        this.updateCaretPosition();
+    }
 
-function updateCaretPosition(pixiText: Text) {
+    private updateCaretPosition(): void {
+        const style = this.pixiText.style;
+        const cursorPointer = this.textarea?.selectionStart ?? this.pixiText.text.length;
+        const text = this.pixiText.text.substring(0, cursorPointer) + "|";
 
-    const style = pixiText.style;
+        const metrics = CanvasTextMetrics.measureText(text, style);
+        const lines = metrics.lines;
+        const lastLine = lines[lines.length - 1];
 
-    const textarea = document.activeElement as HTMLTextAreaElement;
-    const cursorPointer = textarea?.selectionStart ?? pixiText.text.length;
+        const lastLineMetrics = CanvasTextMetrics.measureText(lastLine, style);
+        const charWidth = CanvasTextMetrics.measureText("|", style).width;
 
-    const text = pixiText.text.substring(0, cursorPointer) + "|";
+        const caretX = this.pixiText.x + (lastLineMetrics.width - charWidth);
+        const lineHeight = style.lineHeight || (Number(style.fontSize) * 1.2);
+        const caretY = this.pixiText.y + (lines.length - 1) * lineHeight;
 
-    const metrics = CanvasTextMetrics.measureText(text, style);
+        this.caret.position.set(caretX, caretY);
+    }
 
-    const lines = metrics.lines;
-    const lastLine = lines[lines.length - 1];
+    public close(): void {
+        this.note.updateContent(this.textarea.value);
+        this.pixiText.text = this.note.content;
+        this.caret.visible = false;
 
-    const lastLineMetrics = CanvasTextMetrics.measureText(lastLine, style);
-    const charWidth = CanvasTextMetrics.measureText("|", style).width;
+        if (this.textarea.parentNode) {
+            document.body.removeChild(this.textarea);
+        }
 
-    const caretX = pixiText.x + (lastLineMetrics.width - charWidth);
-    const lineHeight = style.lineHeight || (Number(style.fontSize) * 1.2);
-    const caretY = pixiText.y + (lines.length - 1) * lineHeight;
-
-    caret.position.set(caretX, caretY);
+        this.pixiText.off("pointerdown", this.handlePointerDown);
+    }
 }

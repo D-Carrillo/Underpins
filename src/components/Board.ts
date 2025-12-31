@@ -22,16 +22,14 @@ export class Board {
 
         app.canvas.addEventListener('contextmenu', (e) => e.preventDefault());
 
+        BoardManager.setNoteMap(() => this.noteMap);
+        BoardManager.setStage(this.stage);
+
         this.loadMenu();
         this.loadSavedNotes();
         this.loadThreads();
         this.observerFunctionForNotes();
         this.observerFunctionForThreads();
-
-        BoardManager.setNoteMap(() => this.noteMap);
-        BoardManager.setStage(this.stage);
-
-        // app.renderer.on('resize', () => this.OnResize());
     }
 
     private loadSavedNotes(){
