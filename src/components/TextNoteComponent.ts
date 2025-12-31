@@ -1,10 +1,12 @@
-import {TextNote as TextN} from "../notes/TextNote.ts";
 import {
     Container,
     ContainerChild,
     FederatedPointerEvent,
-    Graphics, Text, TextStyle
+    Graphics,
+    Text,
+    TextStyle
 } from "pixi.js";
+import {TextNote as TextN} from "../notes/TextNote.ts";
 import {openEditor} from "./TextEditor.ts";
 import {useContextMenu} from "../menus/BaseMenu.ts";
 import {NoteMenu} from "../menus/NoteMenu.ts";
@@ -18,19 +20,17 @@ export class TextNoteComponent {
 
     public makeNote(stage: Container<ContainerChild>): Container {
         const NoteGroup = new Container();
-
         NoteGroup.label = this.note.id;
-
         this.MakeNoteGraphics(NoteGroup, stage);
-
         stage.addChild(NoteGroup);
-
         return NoteGroup;
     }
 
-    private MakeNoteGraphics(NoteGroup: Container<ContainerChild>, stage: Container<ContainerChild> ): Graphics {
-        //Let's get a sprite and make it more aesthetic, for the note;
-        const NoteGraphics = new Graphics().rect(this.note.position.x, this.note.position.y, this.note.sizes.width, this.note.sizes.height).fill('fffc99');
+    private MakeNoteGraphics(NoteGroup: Container<ContainerChild>, stage: Container<ContainerChild>): Graphics {
+        const NoteGraphics = new Graphics()
+            .rect(this.note.position.x, this.note.position.y, this.note.sizes.width, this.note.sizes.height)
+            .fill('fffc99');
+
         NoteGroup.addChild(NoteGraphics);
 
         const noteText = this.makeTheTextGraphic();
@@ -43,15 +43,16 @@ export class TextNoteComponent {
     }
 
     private makeTheTextGraphic(): Text {
+        const padding = 16;
         const style = new TextStyle({
-            fontFamily: "Arial",
+            fontFamily: "League Gothic",
             fontSize: 16,
             fill: 0x000000,
-            padding: 1,
+            // padding: 1,
             wordWrap: true,
-            wordWrapWidth: this.note.sizes.width - 25,
+            wordWrapWidth: this.note.sizes.width - (padding * 2),
             breakWords: true,
-        })
+        });
 
         const text = new Text({
             text: this.note.content,
@@ -59,10 +60,10 @@ export class TextNoteComponent {
             resolution: window.devicePixelRatio,
         });
 
-        text.x = this.note.position.x + 17;
-        text.y = this.note.position.y + 12;
+        text.x = this.note.position.x + padding;
+        text.y = this.note.position.y + padding;
 
-        return text
+        return text;
     }
 
     private makeDraggable(target: Container, stage: Container<ContainerChild>, text: Text) {
@@ -74,8 +75,7 @@ export class TextNoteComponent {
         target.on('pointerdown', onDragStart);
 
         let dragTarget: Graphics | null = null;
-
-        let offset = {x: 0, y: 0}
+        let offset = {x: 0, y: 0};
 
         function onDragStart(event: FederatedPointerEvent) {
             dragTarget = event.currentTarget as Graphics;
@@ -88,10 +88,8 @@ export class TextNoteComponent {
             stage.on('pointermove', onDragMove);
         }
 
-        function onDragMove( event: FederatedPointerEvent) {
-            if(dragTarget) {
-                dragTarget.parent!.toLocal(event.global, undefined, dragTarget.position);
-
+        const onDragMove = (event: FederatedPointerEvent) => {
+            if (dragTarget) {
                 const localPos = dragTarget.parent!.toLocal(event.global);
                 dragTarget.x = localPos.x + offset.x;
                 dragTarget.y = localPos.y + offset.y;
@@ -99,14 +97,13 @@ export class TextNoteComponent {
         }
 
         const onDragEnd = () => {
-            if(dragTarget) {
-                const distance = Math.sqrt(Math.pow(dragTarget.x - this.note.position.x,2) + Math.pow(dragTarget.y - this.note.position.y, 2))
+            if (dragTarget) {
+                const distance = Math.sqrt(Math.pow(dragTarget.x - this.note.position.x, 2) + Math.pow(dragTarget.y - this.note.position.y, 2));
 
                 distance > 5 ? this.note.changeCoordinate(dragTarget.x, dragTarget.y) : openEditor(text, this.note);
 
                 stage.off('pointermove', onDragMove);
                 dragTarget.alpha = 1;
-
                 dragTarget = null;
             }
         }
