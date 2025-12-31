@@ -10,7 +10,6 @@ import {TextNote as TextN} from "../notes/TextNote.ts";
 import {TextEditor} from "./TextEditor.ts";
 import {useContextMenu} from "../menus/BaseMenu.ts";
 import {NoteMenu} from "../menus/NoteMenu.ts";
-import {BoardManager} from "../managers/BoardManager.ts";
 
 export class TextNoteComponent {
     private readonly note: TextN
@@ -21,7 +20,7 @@ export class TextNoteComponent {
         const bounds = this.NoteGroup.getBounds();
 
         if (!bounds.containsPoint(event.globalX, event.globalY)) {
-            console.log("The one got click");
+            console.log("The one got click", this.NoteGroup);
             this.closeEditor();
         }
     }
@@ -128,10 +127,9 @@ export class TextNoteComponent {
 
     private closeEditor() {
         if (this.editing !== null) {
-
-            setTimeout(() => {
-                BoardManager.getStage()!.off('pointerdown', this.closeOnBlur);
-            }, 0);
+            // setTimeout(() => {
+            //     BoardManager.getStage()!.off('pointerdown', this.closeOnBlur);
+            // }, 0);
 
             this.editing.close();
         }
@@ -139,6 +137,7 @@ export class TextNoteComponent {
 
     private makeEditable(target: Container) {
         target.on("rightclick", (event) => {
+            event.stopPropagation();
             this.closeEditor();
             useContextMenu(event.nativeEvent as MouseEvent, NoteMenu, this.note.id);
         });
