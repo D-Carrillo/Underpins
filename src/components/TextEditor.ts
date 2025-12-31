@@ -54,6 +54,7 @@ export function openEditor(pixiText: Text, note: TextNote) {
 
     pixiText.on('pointerdown', (event) => {
         event.stopPropagation();
+        event.preventDefault();
 
         const style = pixiText.style;
         const text = pixiText.text;
