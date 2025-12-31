@@ -69,7 +69,7 @@ export class TextNoteComponent {
         target.eventMode = 'static';
         target.cursor = 'pointer';
         text.eventMode = 'static';
-        text.cursor = 'text';
+        text.cursor = 'pointer';
 
         target.on('pointerdown', onDragStart);
 

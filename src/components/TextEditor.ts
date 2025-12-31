@@ -30,27 +30,69 @@ export function openEditor(pixiText: Text, note: TextNote) {
     const closeEditor = () => {
         note.updateContent(textarea.value);
         pixiText.text = note.content;
-        pixiText.visible = true;
         caret.visible = false;
         document.body.removeChild(textarea);
+        console.log('Got closed');
     }
 
     textarea.addEventListener('input', (event) => {
         const target = event.target as HTMLTextAreaElement;
-        console.log(target.value);
         if (pixiText) {
             pixiText.text = target.value;
             updateCaretPosition(pixiText);
         }
     });
 
-    textarea.addEventListener('blur', closeEditor);
     textarea.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
             textarea.blur();
+            closeEditor();
         }
 
         setTimeout(() => updateCaretPosition(pixiText), 0);
+    });
+
+    pixiText.on('pointerdown', (event) => {
+        event.stopPropagation();
+
+        const style = pixiText.style;
+        const text = pixiText.text;
+
+        const localPoint = pixiText.toLocal(event.global);
+
+        const anchorOffsetXY = {
+            x: pixiText.anchor.x * pixiText.width,
+            y: pixiText.anchor.y * pixiText.height
+        };
+
+        let closestIndex = 0;
+        let minDistance = Number.MAX_VALUE;
+
+        for (let i = 0; i <= text.length; i++) {
+            const testText = text.substring(0, i);
+            const metrics = CanvasTextMetrics.measureText(testText, style);
+
+            const lines = metrics.lines;
+            const lastLine = lines[lines.length - 1] || "";
+            const lastLineMetrics = CanvasTextMetrics.measureText(lastLine, style);
+
+            const charX = lastLineMetrics.width - anchorOffsetXY.x;
+            const lineHeight = style.lineHeight || (Number(style.fontSize) * 1.2);
+            const charY = ((lines.length - 1) * lineHeight) - anchorOffsetXY.y;
+
+            const dx = localPoint.x - charX;
+            const dy = localPoint.y - (charY + (Number(style.fontSize) / 2));
+            const distance = (dx * dx) + (dy * dy);
+
+            if (distance < minDistance) {
+                minDistance = distance;
+                closestIndex = i;
+            }
+        }
+
+        textarea.selectionStart = textarea.selectionEnd = closestIndex;
+        textarea.focus();
+        updateCaretPosition(pixiText);
     });
 }
 
