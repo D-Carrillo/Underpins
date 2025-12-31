@@ -57,7 +57,11 @@ export function openEditor(pixiText: Text, note: TextNote) {
 function updateCaretPosition(pixiText: Text) {
 
     const style = pixiText.style;
-    const text = pixiText.text + `|`;
+
+    const textarea = document.activeElement as HTMLTextAreaElement;
+    const cursorPointer = textarea?.selectionStart ?? pixiText.text.length;
+
+    const text = pixiText.text.substring(0, cursorPointer) + "|";
 
     const metrics = CanvasTextMetrics.measureText(text, style);
 

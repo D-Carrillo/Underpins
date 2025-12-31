@@ -48,7 +48,6 @@ export class TextNoteComponent {
             fontFamily: "League Gothic",
             fontSize: 16,
             fill: 0x000000,
-            // padding: 1,
             wordWrap: true,
             wordWrapWidth: this.note.sizes.width - (padding * 2),
             breakWords: true,
