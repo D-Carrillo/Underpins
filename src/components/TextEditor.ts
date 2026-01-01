@@ -34,7 +34,7 @@ export class TextEditor {
     }
 
     private initCaret() {
-        this.caret.rect(0, 0, 2, 20).fill(0x000000);
+        this.caret.rect(0, 0, 1.5, this.pixiText.style.fontSize).fill(0x000000);
         this.caret.visible = false;
     }
 
@@ -42,8 +42,6 @@ export class TextEditor {
         this.caret.visible = true;
         this.updateCaretPosition();
         this.textarea.focus();
-
-        this.blinkInterval = setInterval(() => {this.caret.visible = !this.caret.visible}, 500);
     }
 
     private setupEventListeners(): void {
@@ -66,7 +64,9 @@ export class TextEditor {
             this.close();
         }
 
-        setTimeout(() => this.updateCaretPosition(), 0);
+        else {
+            setTimeout(() => this.updateCaretPosition(), 0);
+        }
     };
 
     private handlePointerDown = (event: FederatedPointerEvent): void => {
@@ -117,7 +117,7 @@ export class TextEditor {
     }
 
     private updateCaretPosition(): void {
-        this.caret.visible = true;
+        this.resetBlink();
 
         const style = this.pixiText.style;
         const cursorPointer = this.textarea?.selectionStart ?? this.pixiText.text.length;
@@ -134,7 +134,19 @@ export class TextEditor {
         const lineHeight = style.lineHeight || (Number(style.fontSize) * 1.2);
         const caretY = this.pixiText.y + (lines.length - 1) * lineHeight;
 
-        this.caret.position.set(caretX, caretY);
+        this.caret.position.set(caretX, caretY + lines.length);
+
+    }
+
+    private resetBlink() {
+
+        this.caret.visible = true;
+
+        if(this.blinkInterval !== null) {
+            clearInterval(this.blinkInterval);
+        }
+
+        this.blinkInterval = setInterval(() => {this.caret.visible = !this.caret.visible}, 500);
     }
 
     public close(): void {

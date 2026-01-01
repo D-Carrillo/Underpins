@@ -63,7 +63,6 @@ export class Board {
     private observerFunctionForThreads() {
         reaction(() => ThreadManager.getDeletedThreads().length, (_, oldLength) => {
             const newlyDeletedID = Array.from(ThreadManager.getDeletedThreads()).slice(oldLength);
-            console.log("Delete thread observer has been called");
 
             newlyDeletedID.forEach((thread) => {
                 const threadID= thread.ID;

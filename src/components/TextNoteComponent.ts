@@ -40,7 +40,7 @@ export class TextNoteComponent {
     private MakeNoteGraphics(NoteGroup: Container<ContainerChild>, stage: Container<ContainerChild>): Graphics {
         const NoteGraphics = new Graphics()
             .rect(this.note.position.x, this.note.position.y, this.note.sizes.width, this.note.sizes.height)
-            .fill('fffc99');
+            .fill('#f6ecd2');
 
         NoteGroup.addChild(NoteGraphics);
 
@@ -53,11 +53,16 @@ export class TextNoteComponent {
         return NoteGraphics;
     }
 
+    private getFontSizeFunction(): number {
+        return 16;
+    }
+
+
     private makeTheTextGraphic(): Text {
         const padding = 16;
         const style = new TextStyle({
             fontFamily: "League Gothic",
-            fontSize: 16,
+            fontSize: this.getFontSizeFunction(),
             fill: 0x000000,
             wordWrap: true,
             wordWrapWidth: this.note.sizes.width - (padding * 2),
