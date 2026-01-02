@@ -6,26 +6,31 @@ const MIN_DISTANCE = 5;
 export abstract class BaseNoteComponent {
     protected readonly note: BaseNote
     protected NoteGroup: Container;
+    protected Stage: Container<ContainerChild>;
     protected dragTarget: Graphics | null = null;
     protected offset = {x: 0, y: 0};
 
-    public abstract makeNote(stage: Container<ContainerChild>): Container;
-    protected abstract makeDraggable(target: Container, Stage: Container<ContainerChild>, ...args: any[]): void;
+    protected abstract makeNote(): Container;
+    protected abstract makeDraggable(...args: any[]): void;
+    protected abstract onDragStart(event: FederatedPointerEvent): void;
+    protected abstract onDragEnd(): void;
 
-    protected constructor(note: BaseNote) {
+    protected constructor(note: BaseNote, stage: Container<ContainerChild>) {
         this.note = note;
         this.NoteGroup = new Container();
+        this.Stage = stage;
     }
 
-    protected onDragStartHelper(event: FederatedPointerEvent, target: Container, stage: Container<ContainerChild>) {
+    protected onDragStartHelper(event: FederatedPointerEvent) {
         this.dragTarget = event.currentTarget as Graphics;
         this.dragTarget.alpha = 0.7;
 
         const localPos = this.dragTarget.parent!.toLocal(event.global);
-        this.offset.x = target.x - localPos.x;
-        this.offset.y = target.y - localPos.y;
+        this.offset.x = this.NoteGroup.x - localPos.x;
+        this.offset.y = this.NoteGroup.y - localPos.y;
 
-        stage.on('pointermove', this.onDragMove);
+        this.Stage.on('pointermove', this.onDragMove);
+
     }
 
     private onDragMove=  (event: FederatedPointerEvent) => {
@@ -36,13 +41,16 @@ export abstract class BaseNoteComponent {
         }
     }
 
-    protected onDragEndHelper(stage: Container<ContainerChild>): boolean {
+    protected onDragEndHelper(): boolean {
         if (this.dragTarget) {
             const distance = this.getDistance();
 
             this.note.changeCoordinate(this.dragTarget.x, this.dragTarget.y);
 
-            stage.off('pointermove', this.onDragMove);
+            if( this.Stage ) {
+                this.Stage.off('pointermove', this.onDragMove);
+            }
+
             this.dragTarget.alpha = 1;
             this.dragTarget = null;
 
@@ -50,6 +58,12 @@ export abstract class BaseNoteComponent {
         }
 
         return false;
+    }
+
+    protected startListeners(target: Container,onDragStart: (event: FederatedPointerEvent) => void, onDragEnd: () => void) {
+        target.on('pointerdown', onDragStart);
+        target.on('pointerup', onDragEnd);
+        target.on('pointerupoutside', onDragEnd);
     }
 
     private getDistance() {

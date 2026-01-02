@@ -84,7 +84,7 @@ export class Board {
     }
 
     private createVisualNote(note: TextNote) {
-        const singularNoteContainer = new TextNoteComponent(note).makeNote(this.stage);
+        const singularNoteContainer = new TextNoteComponent(note, this.stage).getTextNoteVisual();
         this.noteMap.set(note.id, singularNoteContainer);
     }
 

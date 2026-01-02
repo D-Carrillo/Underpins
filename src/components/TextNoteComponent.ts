@@ -15,38 +15,37 @@ import {BaseNoteComponent} from "./BaseNoteComponent.ts";
 
 export class TextNoteComponent extends BaseNoteComponent{
     private editing: TextEditor | null = null;
+    private readonly text: Text;
+    private readonly noteVisual: Container;
 
-    private closeOnBlur = (event: FederatedPointerEvent) => {
-        const bounds = this.NoteGroup.getBounds();
 
-        if (!bounds.containsPoint(event.globalX, event.globalY)) {
-            this.closeEditor();
-        }
+    constructor(concrete_note: TextN, stage: Container<ContainerChild>) {
+        super(concrete_note, stage)
+        this.text = this.makeTheTextGraphic();
+        this.noteVisual = this.makeNote();
     }
 
-    constructor(concrete_note: TextN) {
-        super(concrete_note)
-    }
+    public getTextNoteVisual = (): Container => this.noteVisual;
 
-    public makeNote(stage: Container<ContainerChild>): Container {
+    protected makeNote(): Container {
         this.NoteGroup.label = this.note.id;
-        this.MakeTextNoteGraphics(this.NoteGroup, stage);
-        stage.addChild(this.NoteGroup);
+        this.MakeTextNoteGraphics();
+        this.Stage.addChild(this.NoteGroup);
+
         return this.NoteGroup;
     }
 
-    private MakeTextNoteGraphics(NoteGroup: Container<ContainerChild>, stage: Container<ContainerChild>): Graphics {
+    private MakeTextNoteGraphics(): Graphics {
         const NoteGraphics = new Graphics()
             .rect(this.note.position.x, this.note.position.y, this.note.sizes.width, this.note.sizes.height)
             .fill('#f6ecd2');
 
-        NoteGroup.addChild(NoteGraphics);
+        this.NoteGroup.addChild(NoteGraphics);
 
-        const noteText = this.makeTheTextGraphic();
-        NoteGroup.addChild(noteText);
+        this.NoteGroup.addChild(this.text);
 
-        this.makeDraggable(NoteGroup, stage, noteText);
-        this.makeEditable(NoteGroup);
+        this.makeDraggable();
+        this.makeEditable();
 
         return NoteGraphics;
     }
@@ -66,7 +65,7 @@ export class TextNoteComponent extends BaseNoteComponent{
             breakWords: true,
         });
 
-        const text = new Text({
+            const text = new Text({
             text: this.note.content,
             style,
             resolution: window.devicePixelRatio,
@@ -89,30 +88,29 @@ export class TextNoteComponent extends BaseNoteComponent{
         }
     }
 
-    protected makeDraggable(target: Container, stage: Container<ContainerChild>, text: Text) {
-        target.eventMode = 'static';
-        target.cursor = 'pointer';
-        text.eventMode = 'static';
-        text.cursor = 'pointer';
-
-        const onDragStart = (event: FederatedPointerEvent) => {
-            this.closeEditor();
-            this.onDragStartHelper(event, target, stage);
-        }
-
-        const onDragEnd = () => {
-            if (this.dragTarget && this.onDragEndHelper(stage)) {
-                this.getEditing(text);
-            }
-        }
-
-        target.on('pointerdown', onDragStart);
-        target.on('pointerup', onDragEnd);
-        target.on('pointerupoutside', onDragEnd);
+    protected onDragStart = (event: FederatedPointerEvent) => {
+        this.closeEditor();
+        this.onDragStartHelper(event);
     }
 
-    private makeEditable(target: Container) {
-        target.on("rightclick", (event) => {
+    protected onDragEnd = () => {
+        if (this.dragTarget && this.onDragEndHelper()) {
+            this.getEditing(this.text);
+        }
+    }
+
+    protected makeDraggable() {
+        this.NoteGroup.eventMode = 'static';
+        this.NoteGroup.cursor = 'pointer';
+        this.text.eventMode = 'static';
+        this.text.cursor = 'pointer';
+
+
+        this.startListeners(this.NoteGroup, this.onDragStart, this.onDragEnd)
+    }
+
+    private makeEditable() {
+        this.NoteGroup.on("rightclick", (event) => {
             event.stopPropagation();
             this.closeEditor();
             useContextMenu(event.nativeEvent as MouseEvent, NoteMenu, this.note.id);
@@ -128,5 +126,13 @@ export class TextNoteComponent extends BaseNoteComponent{
         this.editing.open();
 
         BoardManager.getStage()!.on('pointerdown', this.closeOnBlur);
+    }
+
+    private closeOnBlur = (event: FederatedPointerEvent) => {
+        const bounds = this.NoteGroup.getBounds();
+
+        if (!bounds.containsPoint(event.globalX, event.globalY)) {
+            this.closeEditor();
+        }
     }
 }
