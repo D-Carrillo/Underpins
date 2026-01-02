@@ -11,7 +11,7 @@ export abstract class BaseNoteComponent {
     protected dragTarget: Graphics | null = null;
     protected offset = {x: 0, y: 0};
 
-    protected abstract makeNote(): Container;
+    public abstract makeNote(): Container;
     protected abstract makeDraggable(...args: any[]): void;
     protected abstract onDragStart(event: FederatedPointerEvent): void;
     protected abstract onDragEnd(): void;
@@ -20,6 +20,17 @@ export abstract class BaseNoteComponent {
         this.note = note;
         this.NoteGroup = new Container();
         this.Stage = stage;
+    }
+
+    protected makeNoteBaseGraphics(Menu: MenuCreator) {
+        const NoteGraphics = new Graphics()
+            .rect(this.note.position.x, this.note.position.y, this.note.sizes.width, this.note.sizes.height)
+            .fill('#f6ecd2');
+
+        this.NoteGroup.addChild(NoteGraphics);
+
+        this.makeDraggable();
+        this.makeEditable(Menu);
     }
 
     protected onDragStartHelper(event: FederatedPointerEvent) {

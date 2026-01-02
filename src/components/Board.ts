@@ -1,6 +1,5 @@
 import {Application, Container, ContainerChild} from "pixi.js";
 import {TextNoteComponent} from "./TextNoteComponent.ts";
-import {TextNote} from "../notes/TextNote.ts";
 import {NotesManager} from "../managers/NoteManager.ts";
 import {observe, reaction} from "mobx";
 import {useContextMenu} from "../menus/BaseMenu.ts";
@@ -9,6 +8,9 @@ import {ThreadComponent} from "./ThreadComponent.ts";
 import { ThreadManager } from "../managers/ThreadManager.ts";
 import {BaseThread} from "../threads/BaseThread.ts";
 import {BoardManager} from "../managers/BoardManager.ts";
+import {BaseNote} from "../notes/BaseNote.ts";
+import {TextNote} from "../notes/TextNote.ts";
+import {ImageNoteComponent} from "./ImageNoteComponent.ts";
 
 export class Board {
     private readonly stage: Container<ContainerChild>
@@ -83,8 +85,16 @@ export class Board {
     public update() {
     }
 
-    private createVisualNote(note: TextNote) {
-        const singularNoteContainer = new TextNoteComponent(note, this.stage).getTextNoteVisual();
+    private createVisualNote(note: BaseNote) {
+        let singularNoteContainer: Container;
+
+        // Need to make a factory
+        if (note instanceof TextNote) {
+            singularNoteContainer = new TextNoteComponent(note, this.stage).makeNote();
+        } else {
+            singularNoteContainer = new ImageNoteComponent(note, this.stage).makeNote();
+        }
+
         this.noteMap.set(note.id, singularNoteContainer);
     }
 

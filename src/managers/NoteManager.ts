@@ -3,6 +3,7 @@ import NoteFactory from "../factories/NoteFactory.ts";
 import { makeAutoObservable } from "mobx";
 import {BaseNote} from "../notes/BaseNote.ts";
 import {BlurFilter, Container, ContainerChild, Graphics} from "pixi.js";
+import {ImageNote} from "../notes/ImageNote.ts";
 
 class ManagerForNotes{
     private notes: BaseNote[];
@@ -48,7 +49,7 @@ class ManagerForNotes{
 
     //Only for when we don't have JSON
     public loadNotes(): BaseNote[] {
-        return [new TextNote("Type Here", 100, 200), new TextNote("Type here \n and here", 400, 100), new TextNote("This is the third \n note", 400, 300)];
+        return [new TextNote("Type Here", 100, 200), new TextNote("Type here \n and here", 400, 100), new TextNote("This is the third \n note", 400, 300), new ImageNote('location', 500, 400)];
     }
 
     public destroyVisualNote(noteVisual: Container<ContainerChild>) {

@@ -2,7 +2,6 @@ import {
     Container,
     ContainerChild,
     FederatedPointerEvent,
-    Graphics,
     Text,
     TextStyle
 } from "pixi.js";
@@ -15,38 +14,19 @@ import {BaseNoteComponent} from "./BaseNoteComponent.ts";
 export class TextNoteComponent extends BaseNoteComponent{
     private editing: TextEditor | null = null;
     private readonly text: Text;
-    private readonly noteVisual: Container;
-
 
     constructor(concrete_note: TextN, stage: Container<ContainerChild>) {
         super(concrete_note, stage)
         this.text = this.makeTheTextGraphic();
-        this.noteVisual = this.makeNote();
     }
 
-    public getTextNoteVisual = (): Container => this.noteVisual;
-
-    protected makeNote(): Container {
+    public makeNote(): Container {
         this.NoteGroup.label = this.note.id;
-        this.MakeTextNoteGraphics();
+        this.makeNoteBaseGraphics(NoteMenu);
         this.Stage.addChild(this.NoteGroup);
-
-        return this.NoteGroup;
-    }
-
-    private MakeTextNoteGraphics(): Graphics {
-        const NoteGraphics = new Graphics()
-            .rect(this.note.position.x, this.note.position.y, this.note.sizes.width, this.note.sizes.height)
-            .fill('#f6ecd2');
-
-        this.NoteGroup.addChild(NoteGraphics);
-
         this.NoteGroup.addChild(this.text);
 
-        this.makeDraggable();
-        this.makeEditable(NoteMenu);
-
-        return NoteGraphics;
+        return this.NoteGroup;
     }
 
     private getFontSizeFunction(): number {
@@ -64,7 +44,7 @@ export class TextNoteComponent extends BaseNoteComponent{
             breakWords: true,
         });
 
-            const text = new Text({
+        const text = new Text({
             text: this.note.content,
             style,
             resolution: window.devicePixelRatio,

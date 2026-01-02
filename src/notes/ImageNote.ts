@@ -1,7 +1,7 @@
 import {BaseNote} from "./BaseNote.ts";
 
-const INIT_HEIGHT = 250;
-const INIT_WIDTH = 400;
+const INIT_HEIGHT = 300;
+const INIT_WIDTH = 300;
 
 export class ImageNote extends BaseNote {
 
