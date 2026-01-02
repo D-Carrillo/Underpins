@@ -2,6 +2,7 @@ import {BaseNoteComponent} from "./BaseNoteComponent.ts";
 import {Container, ContainerChild, FederatedPointerEvent} from "pixi.js";
 import {ImageNote} from "../notes/ImageNote.ts";
 import {NoteMenu} from "../menus/NoteMenu.ts";
+import {MenuCreator} from "../menus/BaseMenu.ts";
 
 export class ImageNoteComponent extends BaseNoteComponent{
 
@@ -12,11 +13,15 @@ export class ImageNoteComponent extends BaseNoteComponent{
     public makeNote(): Container {
         this.NoteGroup.label = this.note.id;
         this.makeNoteBaseGraphics(NoteMenu);
-        this.Stage.addChild(this.NoteGroup);
 
         return this.NoteGroup;
     }
 
+    protected override makeNoteBaseGraphics(Menu: MenuCreator) {
+        super.makeNoteBaseGraphics(Menu);
+
+        //TODO add the black border around the image.
+    }
 
     protected makeDraggable() {
         this.NoteGroup.eventMode = 'static';
