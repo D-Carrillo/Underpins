@@ -1,5 +1,5 @@
 import {BaseNoteComponent} from "./BaseNoteComponent.ts";
-import {Container, ContainerChild, FederatedPointerEvent} from "pixi.js";
+import {Container, ContainerChild, FederatedPointerEvent, Graphics} from "pixi.js";
 import {ImageNote} from "../notes/ImageNote.ts";
 import {NoteMenu} from "../menus/NoteMenu.ts";
 import {MenuCreator} from "../menus/BaseMenu.ts";
@@ -19,8 +19,17 @@ export class ImageNoteComponent extends BaseNoteComponent{
 
     protected override makeNoteBaseGraphics(Menu: MenuCreator) {
         super.makeNoteBaseGraphics(Menu);
+        this.addBorder();
 
-        //TODO add the black border around the image.
+        //TODO add the image
+    }
+
+    private addBorder() {
+        const border = this.NoteGroup.getChildAt(1) as Graphics;
+
+        border.stroke({width: 2, color: 0x000000});
+        // this is not a solution but until I add the color into the base notes.
+        border.fill('#f8f8ff');
     }
 
     protected makeDraggable() {
