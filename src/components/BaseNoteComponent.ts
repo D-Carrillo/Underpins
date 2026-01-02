@@ -1,5 +1,6 @@
 import {BaseNote} from "../notes/BaseNote.ts";
 import {Container, ContainerChild, FederatedPointerEvent, Graphics} from "pixi.js";
+import {MenuCreator, useContextMenu} from "../menus/BaseMenu.ts";
 
 const MIN_DISTANCE = 5;
 
@@ -68,5 +69,12 @@ export abstract class BaseNoteComponent {
 
     private getDistance() {
         return Math.sqrt(Math.pow(this.dragTarget!.x - this.note.position.x, 2) + Math.pow(this.dragTarget!.y - this.note.position.y, 2));
+    }
+
+    protected makeEditable(Menu: MenuCreator) {
+        this.NoteGroup.on("rightclick", (event) => {
+            event.stopPropagation();
+            useContextMenu(event.nativeEvent as MouseEvent, Menu, this.note.id);
+        });
     }
 }

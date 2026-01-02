@@ -1,4 +1,4 @@
-type MenuCreator = (e: MouseEvent, m: HTMLDivElement, t: string) => void;
+export type MenuCreator = (e: MouseEvent, m: HTMLDivElement, t: string) => void;
 
 export function useContextMenu(event: MouseEvent,  wantedMenu: MenuCreator, wildcard: string) {
     event.preventDefault();

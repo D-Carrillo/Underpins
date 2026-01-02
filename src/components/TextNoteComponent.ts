@@ -8,7 +8,6 @@ import {
 } from "pixi.js";
 import {TextNote as TextN} from "../notes/TextNote.ts";
 import {TextEditor} from "./TextEditor.ts";
-import {useContextMenu} from "../menus/BaseMenu.ts";
 import {NoteMenu} from "../menus/NoteMenu.ts";
 import {BoardManager} from "../managers/BoardManager.ts";
 import {BaseNoteComponent} from "./BaseNoteComponent.ts";
@@ -45,7 +44,7 @@ export class TextNoteComponent extends BaseNoteComponent{
         this.NoteGroup.addChild(this.text);
 
         this.makeDraggable();
-        this.makeEditable();
+        this.makeEditable(NoteMenu);
 
         return NoteGraphics;
     }
@@ -107,14 +106,6 @@ export class TextNoteComponent extends BaseNoteComponent{
 
 
         this.startListeners(this.NoteGroup, this.onDragStart, this.onDragEnd)
-    }
-
-    private makeEditable() {
-        this.NoteGroup.on("rightclick", (event) => {
-            event.stopPropagation();
-            this.closeEditor();
-            useContextMenu(event.nativeEvent as MouseEvent, NoteMenu, this.note.id);
-        });
     }
 
     private getEditing(text: Text) {
