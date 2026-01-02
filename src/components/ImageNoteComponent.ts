@@ -28,7 +28,6 @@ export class ImageNoteComponent extends BaseNoteComponent{
 
     protected onDragEnd = ()=> {
         if (this.dragTarget && this.onDragEndHelper()) {
-            console.log("Only got clicked");
         }
     }
 

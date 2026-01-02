@@ -1,5 +1,5 @@
 import {BaseNote} from "../notes/BaseNote.ts";
-import {Container, ContainerChild, FederatedPointerEvent, Graphics} from "pixi.js";
+import {Container, ContainerChild, FederatedPointerEvent, Graphics, BlurFilter} from "pixi.js";
 import {MenuCreator, useContextMenu} from "../menus/BaseMenu.ts";
 
 const MIN_DISTANCE = 5;
@@ -27,6 +27,11 @@ export abstract class BaseNoteComponent {
             .rect(this.note.position.x, this.note.position.y, this.note.sizes.width, this.note.sizes.height)
             .fill('#f6ecd2');
 
+        const glow = new Graphics().rect(this.note.position.x, this.note.position.y, this.note.sizes.width, this.note.sizes.height).fill('#ab9f97');
+
+        glow.filters = new BlurFilter({strength: 5});
+
+        this.NoteGroup.addChild(glow);
         this.NoteGroup.addChild(NoteGraphics);
 
         this.makeDraggable();
@@ -35,6 +40,7 @@ export abstract class BaseNoteComponent {
 
     protected onDragStartHelper(event: FederatedPointerEvent) {
         this.dragTarget = event.currentTarget as Graphics;
+        this.dragTarget.getChildAt(0).alpha = 0.3;
         this.dragTarget.alpha = 0.7;
 
         const localPos = this.dragTarget.parent!.toLocal(event.global);
@@ -64,6 +70,7 @@ export abstract class BaseNoteComponent {
             }
 
             this.dragTarget.alpha = 1;
+            this.dragTarget.getChildAt(0).alpha = 1;
             this.dragTarget = null;
 
             return distance < MIN_DISTANCE;
