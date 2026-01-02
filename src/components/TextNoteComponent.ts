@@ -11,11 +11,10 @@ import {TextEditor} from "./TextEditor.ts";
 import {useContextMenu} from "../menus/BaseMenu.ts";
 import {NoteMenu} from "../menus/NoteMenu.ts";
 import {BoardManager} from "../managers/BoardManager.ts";
+import {BaseNoteComponent} from "./BaseNoteComponent.ts";
 
-export class TextNoteComponent {
-    private readonly note: TextN
+export class TextNoteComponent extends BaseNoteComponent{
     private editing: TextEditor | null = null;
-    private NoteGroup: Container;
 
     private closeOnBlur = (event: FederatedPointerEvent) => {
         const bounds = this.NoteGroup.getBounds();
@@ -26,18 +25,17 @@ export class TextNoteComponent {
     }
 
     constructor(concrete_note: TextN) {
-        this.note = concrete_note;
-        this.NoteGroup = new Container();
+        super(concrete_note)
     }
 
     public makeNote(stage: Container<ContainerChild>): Container {
         this.NoteGroup.label = this.note.id;
-        this.MakeNoteGraphics(this.NoteGroup, stage);
+        this.MakeTextNoteGraphics(this.NoteGroup, stage);
         stage.addChild(this.NoteGroup);
         return this.NoteGroup;
     }
 
-    private MakeNoteGraphics(NoteGroup: Container<ContainerChild>, stage: Container<ContainerChild>): Graphics {
+    private MakeTextNoteGraphics(NoteGroup: Container<ContainerChild>, stage: Container<ContainerChild>): Graphics {
         const NoteGraphics = new Graphics()
             .rect(this.note.position.x, this.note.position.y, this.note.sizes.width, this.note.sizes.height)
             .fill('#f6ecd2');
@@ -56,7 +54,6 @@ export class TextNoteComponent {
     private getFontSizeFunction(): number {
         return 16;
     }
-
 
     private makeTheTextGraphic(): Text {
         const padding = 16;
@@ -81,53 +78,6 @@ export class TextNoteComponent {
         return text;
     }
 
-    private makeDraggable(target: Container, stage: Container<ContainerChild>, text: Text) {
-        target.eventMode = 'static';
-        target.cursor = 'pointer';
-        text.eventMode = 'static';
-        text.cursor = 'pointer';
-
-        let dragTarget: Graphics | null = null;
-        let offset = {x: 0, y: 0};
-
-        const onDragStart = (event: FederatedPointerEvent) => {
-            dragTarget = event.currentTarget as Graphics;
-            dragTarget.alpha = 0.7;
-
-            this.closeEditor();
-
-            const localPos = dragTarget.parent!.toLocal(event.global);
-            offset.x = target.x - localPos.x;
-            offset.y = target.y - localPos.y;
-
-            stage.on('pointermove', onDragMove);
-        }
-
-        const onDragMove = (event: FederatedPointerEvent) => {
-            if (dragTarget) {
-                const localPos = dragTarget.parent!.toLocal(event.global);
-                dragTarget.x = localPos.x + offset.x;
-                dragTarget.y = localPos.y + offset.y;
-            }
-        }
-
-        const onDragEnd = () => {
-            if (dragTarget) {
-                const distance = Math.sqrt(Math.pow(dragTarget.x - this.note.position.x, 2) + Math.pow(dragTarget.y - this.note.position.y, 2));
-
-                distance > 5 ? this.note.changeCoordinate(dragTarget.x, dragTarget.y) : this.getEditing(text);
-
-                stage.off('pointermove', onDragMove);
-                dragTarget.alpha = 1;
-                dragTarget = null;
-            }
-        }
-
-        target.on('pointerdown', onDragStart);
-        target.on('pointerup', onDragEnd);
-        target.on('pointerupoutside', onDragEnd);
-    }
-
     private closeEditor() {
         if (this.editing !== null) {
             setTimeout(() => {
@@ -137,6 +87,28 @@ export class TextNoteComponent {
             this.editing.close();
             this.editing = null;
         }
+    }
+
+    protected makeDraggable(target: Container, stage: Container<ContainerChild>, text: Text) {
+        target.eventMode = 'static';
+        target.cursor = 'pointer';
+        text.eventMode = 'static';
+        text.cursor = 'pointer';
+
+        const onDragStart = (event: FederatedPointerEvent) => {
+            this.closeEditor();
+            this.onDragStartHelper(event, target, stage);
+        }
+
+        const onDragEnd = () => {
+            if (this.dragTarget && this.onDragEndHelper(stage)) {
+                this.getEditing(text);
+            }
+        }
+
+        target.on('pointerdown', onDragStart);
+        target.on('pointerup', onDragEnd);
+        target.on('pointerupoutside', onDragEnd);
     }
 
     private makeEditable(target: Container) {
