@@ -30,7 +30,9 @@ export class ImageNoteComponent extends BaseNoteComponent{
 
             imageSprite.anchor.set(0.5);
             imageSprite.position.set(this.note.position.x + this.note.sizes.width / 2, this.note.position.y + this.note.sizes.height / 2);
-            imageSprite.scale.set(0.35);
+
+            imageSprite.width = this.note.sizes.width - 30;
+            imageSprite.height = this.note.sizes.height - 30;
 
             this.NoteGroup.addChild(imageSprite);
 
