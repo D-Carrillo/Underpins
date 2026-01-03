@@ -50,7 +50,7 @@ class ManagerForNotes{
 
     //Only for when we don't have JSON
     public loadNotes(): BaseNote[] {
-        return [new TextNote("Type Here", 100, 200), new TextNote("Type here \n and here", 400, 100), new TextNote("This is the third \n note", 400, 300), new ImageNote('/image1.jpg', 700, 200)];
+        return [new TextNote("Type Here", 100, 200), new TextNote("Type here \n and here", 400, 100), new TextNote("This is the third \n note", 400, 300), new ImageNote('/images/image1.jpg', 700, 200)];
     }
 
     public destroyVisualNote(noteVisual: Container<ContainerChild>) {
