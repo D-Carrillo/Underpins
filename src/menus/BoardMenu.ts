@@ -1,13 +1,24 @@
-import { NotesManager } from "../managers/NoteManager.ts";
+import {NotesManager} from "../managers/NoteManager.ts";
+import {NoteTypes} from "../factories/NoteTypesEnum.ts";
 
-export function BoardMenu(event: MouseEvent, menu: HTMLDivElement, type:string) {
-    const button = document.createElement("button");
-    button.textContent = "Add New Text Note";
+export function BoardMenu(event: MouseEvent, menu: HTMLDivElement, _: string) {
+    const TextNoteNewButton = document.createElement("button");
+    TextNoteNewButton.textContent = "Add Text Note";
 
-    button.onclick = () => {
-        NotesManager.createNote(event.pageX, event.pageY, type);
+    const ImageNoteNewButton = document.createElement("button");
+    ImageNoteNewButton.textContent = "Add Image Note";
+
+
+    TextNoteNewButton.onclick = () => {
+        NotesManager.createNote(event.pageX, event.pageY, NoteTypes.TEXT);
         menu.remove();
     };
 
-    menu.appendChild(button);
+    ImageNoteNewButton.onclick = () => {
+        NotesManager.createNote(event.pageX, event.pageY, NoteTypes.IMAGE);
+        menu.remove();
+    }
+
+    menu.appendChild(TextNoteNewButton);
+    menu.appendChild(ImageNoteNewButton);
 }

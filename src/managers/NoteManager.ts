@@ -4,6 +4,7 @@ import { makeAutoObservable } from "mobx";
 import {BaseNote} from "../notes/BaseNote.ts";
 import {BlurFilter, Container, ContainerChild, Graphics} from "pixi.js";
 import {ImageNote} from "../notes/ImageNote.ts";
+import {NoteTypes} from "../factories/NoteTypesEnum.ts";
 
 class ManagerForNotes{
     private notes: BaseNote[];
@@ -41,7 +42,7 @@ class ManagerForNotes{
     // DeleteNoteFromJSON()
     // UpdateNoteInformation() - highly polymorphic
 
-    public createNote(x: number, y: number, type: string) {
+    public createNote(x: number, y: number, type: NoteTypes) {
         const newNote = NoteFactory.makeNote(x, y, type);
         this.AddANote(newNote);
         return newNote;
@@ -49,7 +50,7 @@ class ManagerForNotes{
 
     //Only for when we don't have JSON
     public loadNotes(): BaseNote[] {
-        return [new TextNote("Type Here", 100, 200), new TextNote("Type here \n and here", 400, 100), new TextNote("This is the third \n note", 400, 300), new ImageNote('location', 700, 200)];
+        return [new TextNote("Type Here", 100, 200), new TextNote("Type here \n and here", 400, 100), new TextNote("This is the third \n note", 400, 300), new ImageNote('/image1.jpg', 700, 200)];
     }
 
     public destroyVisualNote(noteVisual: Container<ContainerChild>) {

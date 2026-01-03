@@ -106,7 +106,7 @@ export class Board {
     private loadMenu() {
         this.stage.on('rightclick', (event) => {
             if (event.target === this.stage) {
-                useContextMenu(event.nativeEvent as MouseEvent, BoardMenu, 'text');
+                useContextMenu(event.nativeEvent as MouseEvent, BoardMenu, "note");
             }
         })
     }

@@ -25,7 +25,7 @@ export class ImageNoteComponent extends BaseNoteComponent{
 
     private async addTheImage() {
         try {
-            const texture = await Assets.load('/image1.jpg');
+            const texture = await Assets.load(this.note.content);
             const imageSprite = new Sprite(texture);
 
             imageSprite.anchor.set(0.5);
