@@ -14,7 +14,7 @@ class NoteFactory {
             return new ImageNote("/cabinet.jpg", x, y);
         }
 
-        throw new RangeError("Not implemented");
+        throw new Error("Not implemented");
     }
 }
 

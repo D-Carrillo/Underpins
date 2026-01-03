@@ -16,8 +16,8 @@ test("Changing the ImageLocation", () => {
     expect(note.content).toBe('NewImageURL');
 });
 
-test("Image note should be initialized to 250 x 400", () => {
+test("Image note should be initialized to 300 x 300", () => {
     const note = new ImageNote(any<string>(), any<number>(), any<number>());
 
-    expect(note.sizes).toEqual({ height: 250, width: 400});
+    expect(note.sizes).toEqual({ height: 300, width: 300});
 });
