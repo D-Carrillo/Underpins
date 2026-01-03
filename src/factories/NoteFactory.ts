@@ -11,7 +11,7 @@ class NoteFactory {
         }
 
         else if ( type === NoteTypes.IMAGE ) {
-            return new ImageNote("/cabinet.jpg", x, y);
+            return Math.random() % 2 === 0 ? new ImageNote("/cabinet.jpg", x, y) : new ImageNote("/television.jpg", x , y);
         }
 
         throw new Error("Not implemented");

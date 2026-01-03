@@ -12,15 +12,13 @@ export class ImageNoteComponent extends BaseNoteComponent{
 
     public makeNote(): Container {
         this.NoteGroup.label = this.note.id;
-        this.makeNoteBaseGraphics(ImageNoteMenu);
+        this.makeNoteBaseGraphics(ImageNoteMenu)
 
         return this.NoteGroup;
     }
 
     protected override makeNoteBaseGraphics(Menu: MenuCreator) {
-        super.makeNoteBaseGraphics(Menu);
-        this.addBorder();
-        this.addTheImage();
+        this.addTheImage().then(() => {super.makeNoteBaseGraphics(Menu); this.addBorder();});
     }
 
     private async addTheImage() {
@@ -29,10 +27,20 @@ export class ImageNoteComponent extends BaseNoteComponent{
             const imageSprite = new Sprite(texture);
 
             imageSprite.anchor.set(0.5);
+
+            if (imageSprite.width === imageSprite.height) {
+                imageSprite.width = this.note.sizes.width - 30;
+            }
+            else {
+                const width = Math.floor(imageSprite.width * (this.note.sizes.height / imageSprite.height));
+                imageSprite.width = width - 30;
+                this.note.sizes = {width: width, height: 300};
+            }
+
+            imageSprite.height = this.note.sizes.height - 30;
+
             imageSprite.position.set(this.note.position.x + this.note.sizes.width / 2, this.note.position.y + this.note.sizes.height / 2);
 
-            imageSprite.width = this.note.sizes.width - 30;
-            imageSprite.height = this.note.sizes.height - 30;
 
             this.NoteGroup.addChild(imageSprite);
 

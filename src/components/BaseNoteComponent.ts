@@ -27,12 +27,13 @@ export abstract class BaseNoteComponent {
             .rect(this.note.position.x, this.note.position.y, this.note.sizes.width, this.note.sizes.height)
             .fill('#f8f8ff');
 
+
         const glow = new Graphics().rect(this.note.position.x, this.note.position.y, this.note.sizes.width, this.note.sizes.height).fill('#ab9f97');
 
         glow.filters = new BlurFilter({strength: 5});
 
-        this.NoteGroup.addChild(glow);
-        this.NoteGroup.addChild(NoteGraphics);
+        this.NoteGroup.addChildAt(NoteGraphics, 0);
+        this.NoteGroup.addChildAt(glow, 0);
 
         this.makeDraggable();
         this.makeEditable(Menu);
