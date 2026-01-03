@@ -7,7 +7,7 @@ async function init() {
   await app.init({
     resizeTo: window,
     antialias:true,
-    background: '#f8f8ff', //Ghostly White
+    background: 'rgb(222,219,212)', //Ghostly White
     resolution: window.devicePixelRatio,
     autoDensity: true,
     roundPixels: true,

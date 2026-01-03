@@ -49,7 +49,7 @@ class ManagerForNotes{
 
     //Only for when we don't have JSON
     public loadNotes(): BaseNote[] {
-        return [new TextNote("Type Here", 100, 200), new TextNote("Type here \n and here", 400, 100), new TextNote("This is the third \n note", 400, 300), new ImageNote('location', 500, 400)];
+        return [new TextNote("Type Here", 100, 200), new TextNote("Type here \n and here", 400, 100), new TextNote("This is the third \n note", 400, 300), new ImageNote('location', 700, 200)];
     }
 
     public destroyVisualNote(noteVisual: Container<ContainerChild>) {
@@ -60,7 +60,7 @@ class ManagerForNotes{
         //Don't really like the blur, but it can be fixed on the aesthetication process
         noteMap.forEach((visual, ID) => {
            if (originNoteID !== ID) {
-               const glow = new Graphics().rect(visual.getLocalBounds().x, visual.getLocalBounds().y, visual.width, visual.height).fill("80400B");
+               const glow = new Graphics().rect(visual.getLocalBounds().x, visual.getLocalBounds().y, visual.width, visual.height).fill("0x000000");
 
                glow.filters = new BlurFilter({strength: 15});
 

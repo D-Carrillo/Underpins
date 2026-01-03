@@ -17,7 +17,6 @@ export function useContextMenu(event: MouseEvent,  wantedMenu: MenuCreator, wild
 
     document.body.appendChild(menu);
 
-
     const closeMenu = () => menu.remove();
     const escClose = (e: KeyboardEvent) => e.key === "Escape" && closeMenu();
 

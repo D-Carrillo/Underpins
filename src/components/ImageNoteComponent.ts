@@ -1,8 +1,8 @@
 import {BaseNoteComponent} from "./BaseNoteComponent.ts";
-import {Container, ContainerChild, FederatedPointerEvent, Graphics} from "pixi.js";
+import {Assets, Container, ContainerChild, FederatedPointerEvent, Graphics, Sprite} from "pixi.js";
 import {ImageNote} from "../notes/ImageNote.ts";
-import {NoteMenu} from "../menus/NoteMenu.ts";
 import {MenuCreator} from "../menus/BaseMenu.ts";
+import {ImageNoteMenu} from "../menus/ImageNoteMenu.ts";
 
 export class ImageNoteComponent extends BaseNoteComponent{
 
@@ -12,7 +12,7 @@ export class ImageNoteComponent extends BaseNoteComponent{
 
     public makeNote(): Container {
         this.NoteGroup.label = this.note.id;
-        this.makeNoteBaseGraphics(NoteMenu);
+        this.makeNoteBaseGraphics(ImageNoteMenu);
 
         return this.NoteGroup;
     }
@@ -20,8 +20,23 @@ export class ImageNoteComponent extends BaseNoteComponent{
     protected override makeNoteBaseGraphics(Menu: MenuCreator) {
         super.makeNoteBaseGraphics(Menu);
         this.addBorder();
+        this.addTheImage();
+    }
 
-        //TODO add the image
+    private async addTheImage() {
+        try {
+            const texture = await Assets.load('/image1.jpg');
+            const imageSprite = new Sprite(texture);
+
+            imageSprite.anchor.set(0.5);
+            imageSprite.position.set(this.note.position.x + this.note.sizes.width / 2, this.note.position.y + this.note.sizes.height / 2);
+            imageSprite.scale.set(0.35);
+
+            this.NoteGroup.addChild(imageSprite);
+
+        } catch (e) {
+            console.error("Images failed to load", e);
+        }
     }
 
     private addBorder() {

@@ -25,7 +25,7 @@ export abstract class BaseNoteComponent {
     protected makeNoteBaseGraphics(Menu: MenuCreator) {
         const NoteGraphics = new Graphics()
             .rect(this.note.position.x, this.note.position.y, this.note.sizes.width, this.note.sizes.height)
-            .fill('#f6ecd2');
+            .fill('#f8f8ff');
 
         const glow = new Graphics().rect(this.note.position.x, this.note.position.y, this.note.sizes.width, this.note.sizes.height).fill('#ab9f97');
 

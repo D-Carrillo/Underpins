@@ -7,7 +7,7 @@ import {
 } from "pixi.js";
 import {TextNote as TextN} from "../notes/TextNote.ts";
 import {TextEditor} from "./TextEditor.ts";
-import {NoteMenu} from "../menus/NoteMenu.ts";
+import {TextNoteMenu} from "../menus/TextNoteMenu.ts";
 import {BoardManager} from "../managers/BoardManager.ts";
 import {BaseNoteComponent} from "./BaseNoteComponent.ts";
 import {MenuCreator} from "../menus/BaseMenu.ts";
@@ -23,7 +23,7 @@ export class TextNoteComponent extends BaseNoteComponent{
 
     public makeNote(): Container {
         this.NoteGroup.label = this.note.id;
-        this.makeNoteBaseGraphics(NoteMenu);
+        this.makeNoteBaseGraphics(TextNoteMenu);
 
         return this.NoteGroup;
     }
