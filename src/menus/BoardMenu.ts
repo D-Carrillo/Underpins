@@ -15,7 +15,7 @@ export function BoardMenu(event: MouseEvent, menu: HTMLDivElement, _: string) {
     };
 
     ImageNoteNewButton.onclick = () => {
-        // NotesManager.createNote(event.pageX, event.pageY, NoteTypes.IMAGE);
+        /*NotesManager.createNote(event.pageX, event.pageY, NoteTypes.IMAGE); */
         invoke('image_setter', {image: "Image"}).then(msg => console.log(msg));
         menu.remove();
     }
