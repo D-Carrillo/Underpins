@@ -6,19 +6,19 @@ import {NoteTypes} from "../factories/NoteTypesEnum.ts";
 import {ImageNote} from "../notes/ImageNote.ts";
 
 test("Manager creates the correct note type", () => {
-    const note = NotesManager.createNote(any<number>(), any<number>(), NoteTypes.TEXT);
+    const note = NotesManager.createNote(any<number>(), any<number>(), NoteTypes.TEXT, any<string>());
 
     expect(note).toBeInstanceOf(TextNote);
 });
 
 test("Manager creates the correct note type", () => {
-    const note = NotesManager.createNote(any<number>(), any<number>(), NoteTypes.IMAGE);
+    const note = NotesManager.createNote(any<number>(), any<number>(), NoteTypes.IMAGE, any<string>());
 
     expect(note).toBeInstanceOf(ImageNote);
 });
 
 test("Exception is passed to the Manager", () => {
-    expect(() => NotesManager.createNote(any<number>(), any<number>(), any<NoteTypes>())).toThrowError("Not implemented");
+    expect(() => NotesManager.createNote(any<number>(), any<number>(), any<NoteTypes>(), any<string>())).toThrowError("Not implemented");
 });
 
 test(" Note manager deletes correct note", () => {

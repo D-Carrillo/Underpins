@@ -10,13 +10,21 @@ export function BoardMenu(event: MouseEvent, menu: HTMLDivElement, _: string) {
     ImageNoteNewButton.textContent = "Add Image Note";
 
     TextNoteNewButton.onclick = () => {
-        NotesManager.createNote(event.pageX, event.pageY, NoteTypes.TEXT);
+        NotesManager.createNote(event.pageX, event.pageY, NoteTypes.TEXT, "New Note");
         menu.remove();
     };
 
-    ImageNoteNewButton.onclick = () => {
-        /*NotesManager.createNote(event.pageX, event.pageY, NoteTypes.IMAGE); */
-        invoke('image_setter', {image: "Image"}).then(msg => console.log(msg));
+    ImageNoteNewButton.onclick = async () => {
+        try {
+            const folderPath = "../public/images";
+
+            const newImagePath = await invoke('image_setter', {destinationFolder: folderPath}) as string;
+
+            NotesManager.createNote(event.pageX, event.pageY, NoteTypes.IMAGE, newImagePath);
+        } catch (error) {
+            console.error("Error choosing or copying file", error);
+        }
+
         menu.remove();
     }
 

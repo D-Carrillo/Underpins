@@ -5,13 +5,13 @@ import {ImageNote} from "../notes/ImageNote.ts";
 
 
 class NoteFactory {
-    public static makeNote(x: number, y: number, type: NoteTypes): BaseNote {
+    public static makeNote(x: number, y: number, type: NoteTypes, content: string): BaseNote {
         if ( type === NoteTypes.TEXT) {
             return new TextNote("new Note", x, y);
         }
 
         else if ( type === NoteTypes.IMAGE ) {
-            return Math.floor(Math.random()) % 2 === 0 ? new ImageNote("/images/cabinet.jpg", x, y) : new ImageNote("/images/television.jpg", x , y);
+            return new ImageNote(content, x, y);
         }
 
         throw new Error("Not implemented");

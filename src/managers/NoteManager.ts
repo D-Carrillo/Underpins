@@ -42,8 +42,8 @@ class ManagerForNotes{
     // DeleteNoteFromJSON()
     // UpdateNoteInformation() - highly polymorphic
 
-    public createNote(x: number, y: number, type: NoteTypes) {
-        const newNote = NoteFactory.makeNote(x, y, type);
+    public createNote(x: number, y: number, type: NoteTypes, content: string) {
+        const newNote = NoteFactory.makeNote(x, y, type, content);
         this.AddANote(newNote);
         return newNote;
     }
