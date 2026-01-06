@@ -2,9 +2,10 @@ import { CanvasTextMetrics, Text, Graphics, FederatedPointerEvent } from "pixi.j
 import { TextNote } from "../notes/TextNote.ts";
 
 export class TextEditor {
-    private caret: Graphics;
-    private textarea: HTMLTextAreaElement;
-    private pixiText: Text;
+    private readonly caret: Graphics;
+    private readonly selectionBg: Graphics;
+    private readonly textarea: HTMLTextAreaElement;
+    private readonly pixiText: Text;
     private note: TextNote;
     private blinkInterval: number = 0;
 
@@ -12,14 +13,22 @@ export class TextEditor {
         this.pixiText = pixiText;
         this.note = note;
 
+        this.selectionBg = new Graphics();
         this.caret = new Graphics();
+
         this.initCaret();
 
         this.textarea = document.createElement('textarea');
         this.initTextarea(note);
 
         document.body.appendChild(this.textarea);
+
+        pixiText.parent!.addChild(this.selectionBg);
         pixiText.parent!.addChild(this.caret);
+
+        this.selectionBg.roundPixels = true;
+        this.caret.roundPixels = true;
+        this.pixiText.roundPixels = true;
 
         this.setupEventListeners();
     }
@@ -47,6 +56,7 @@ export class TextEditor {
     private setupEventListeners(): void {
         this.textarea.addEventListener('input', this.handleInput);
         this.textarea.addEventListener('keydown', this.handleKeyDown);
+        this.textarea.addEventListener('keyup', this.updateCaretPosition);
         this.pixiText.on("pointerdown", this.handlePointerDown);
     }
 
@@ -55,6 +65,9 @@ export class TextEditor {
         if (this.pixiText) {
             this.pixiText.text = target.value;
             this.updateCaretPosition();
+        }
+        else {
+            setTimeout(() => this.updateCaretPosition(), 0);
         }
     };
 
@@ -65,7 +78,7 @@ export class TextEditor {
         }
 
         else {
-            setTimeout(() => this.updateCaretPosition(), 0);
+            setTimeout(() => this.updateCaretPosition(), 1);
         }
     };
 
@@ -116,30 +129,7 @@ export class TextEditor {
         this.updateCaretPosition();
     }
 
-    private updateCaretPosition(): void {
-        this.resetBlink();
-
-        const style = this.pixiText.style;
-        const cursorPointer = this.textarea?.selectionStart ?? this.pixiText.text.length;
-        const text = this.pixiText.text.substring(0, cursorPointer) + "|";
-
-        const metrics = CanvasTextMetrics.measureText(text, style);
-        const lines = metrics.lines;
-        const lastLine = lines[lines.length - 1];
-
-        const lastLineMetrics = CanvasTextMetrics.measureText(lastLine, style);
-        const charWidth = CanvasTextMetrics.measureText("|", style).width;
-
-        const caretX = this.pixiText.x + (lastLineMetrics.width - charWidth);
-        const lineHeight = style.lineHeight || (Number(style.fontSize) * 1.2);
-        const caretY = this.pixiText.y + (lines.length - 1) * lineHeight;
-
-        this.caret.position.set(caretX, caretY + lines.length);
-
-    }
-
     private resetBlink() {
-
         this.caret.visible = true;
 
         if(this.blinkInterval !== null) {
@@ -149,14 +139,94 @@ export class TextEditor {
         this.blinkInterval = setInterval(() => {this.caret.visible = !this.caret.visible}, 500);
     }
 
+    private updateCaretPosition = (): void => {
+        this.resetBlink();
+        this.selectionBg.clear();
+
+        const style = this.pixiText.style;
+        const rawText = this.pixiText.text;
+        const start = this.textarea.selectionStart;
+        const end = this.textarea.selectionEnd;
+        const lineHeight = style.lineHeight || (Number(style.fontSize) * 1.2);
+
+        const metrics = CanvasTextMetrics.measureText(rawText, style);
+        const lines = metrics.lines;
+
+        const selectionColor = 0x0078d7;
+
+        for (let i = 0, charOffset = 0; i < lines.length; i++) {
+            const lineText = lines[i];
+            const lineStart = charOffset;
+            let lineEnd = lineStart + lineText.length;
+
+            if (rawText[lineEnd] === '\n' || rawText[lineEnd] === ' ') {
+                lineEnd += 1;
+            }
+
+            const intersectStart = Math.max(start, lineStart);
+            const intersectEnd = Math.min(end, lineEnd);
+
+            if (intersectStart < intersectEnd) {
+                let rectX = 0;
+                let rectWidth = 0;
+                let started = false;
+                const escapeSpaces = (s: string) => s.replace(/ /g, '\u00A0');
+
+                for (let j = 0; j < lineText.length; j++) {
+                    const charIndex = lineStart + j; // absolute index in raw text
+                    const char = lineText[j] === ' ' ? '\u00A0' : lineText[j];
+                    const charWidth = CanvasTextMetrics.measureText(char, style).width;
+
+                    if (charIndex >= intersectStart && charIndex < intersectEnd) {
+                        if (!started) {
+                            const textBefore = escapeSpaces(lineText.substring(0, j));
+                            rectX = CanvasTextMetrics.measureText(textBefore, style).width;
+                            started = true;
+                        }
+                        rectWidth += charWidth; // add the width of this selected character
+                    }
+                }
+
+
+                // if selection starts at first character, rectX might still be zero, that's fine
+                this.selectionBg.rect(
+                    this.pixiText.x + rectX,
+                    this.pixiText.y + i * lineHeight,
+                    rectWidth,
+                    lineHeight
+                );
+            }
+
+            charOffset = lineEnd;
+        }
+
+        if (start !== end) {
+            this.selectionBg.fill({ color: selectionColor, alpha: 0.3 });
+        }
+
+        const cursorPointer = this.textarea.selectionDirection === 'backward' ? start : end;
+        const textUntilCaret = rawText.substring(0, cursorPointer);
+        const measurementText = textUntilCaret.replace(/\s$/g, '\u00A0');
+
+        const caretMetrics = CanvasTextMetrics.measureText(measurementText, style);
+        const caretLineIdx = caretMetrics.lines.length - 1;
+        const caretLineText = caretMetrics.lines[caretLineIdx];
+        const caretLineMetrics = CanvasTextMetrics.measureText(caretLineText, style);
+
+        this.caret.position.set(
+            this.pixiText.x + caretLineMetrics.width,
+            this.pixiText.y + (caretLineIdx * lineHeight) + lines.length,
+        );
+    };
+
     public close(): void {
         this.note.updateContent(this.textarea.value);
         this.pixiText.text = this.note.content;
-        this.caret.visible = false;
 
         if (this.blinkInterval !== 0) clearInterval(this.blinkInterval);
 
         this.caret.destroy({children: true});
+        this.selectionBg.destroy({children: true});
 
         if (this.textarea.parentNode) {
             document.body.removeChild(this.textarea);

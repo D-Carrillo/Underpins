@@ -7,7 +7,7 @@ import {ImageNote} from "../notes/ImageNote.ts";
 import {NoteTypes} from "../factories/NoteTypesEnum.ts";
 
 class ManagerForNotes{
-    private notes: BaseNote[];
+    private readonly notes: BaseNote[];
 
     constructor() {
         this.notes = this.loadNotes();
@@ -40,7 +40,6 @@ class ManagerForNotes{
     }
 
     // DeleteNoteFromJSON()
-    // UpdateNoteInformation() - highly polymorphic
 
     public createNote(x: number, y: number, type: NoteTypes, content: string) {
         const newNote = NoteFactory.makeNote(x, y, type, content);
