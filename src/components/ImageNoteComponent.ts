@@ -23,7 +23,8 @@ export class ImageNoteComponent extends BaseNoteComponent{
 
     private async addTheImage() {
         try {
-            const texture = await Assets.load(this.note.content);
+            const url = `gallery://localhost${this.note.content}`;
+            const texture = await Assets.load(url);
             const imageSprite = new Sprite(texture);
 
             imageSprite.anchor.set(0.5);

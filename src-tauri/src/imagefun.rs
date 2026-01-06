@@ -1,28 +1,28 @@
 use std::fs;
-use std::path::Path;
+use tauri::{AppHandle, Manager};
 use rfd::FileDialog;
 
 #[tauri::command]
-pub fn image_setter(destination_folder: String) -> Result<String, String> {
-    let file = FileDialog::new().add_filter("image", &["png", "jpg", "jpeg"]).set_directory("/").pick_file();
+pub fn image_setter(handle: AppHandle) -> Result<String, String> {
+    let file = FileDialog::new()
+        .add_filter("image", &["png", "jpg", "jpeg"])
+        .pick_file();
 
     match file {
         Some(source_path) => {
-            let file_name = source_path.file_name().ok_or("Could not extract filename")?;
+            let app_dir = handle.path().app_data_dir()
+                .map_err(|_| "Could not find app data directory")?;
 
-            let dest_path = Path::new(&destination_folder).join(file_name);
+            let images_dir = app_dir.join("notes_assets");
+            fs::create_dir_all(&images_dir).map_err(|e| e.to_string())?;
 
-            if let Some(parent) = dest_path.parent() {
-                fs::create_dir_all(parent).map_err(|e| e.to_string())?;
-            }
+            let file_name = source_path.file_name().ok_or("No filename")?;
+            let dest_path = images_dir.join(file_name);
 
-            fs::copy(&source_path, &dest_path).map_err(|e| format!("Failed to copy file: {}", e))?;
+            fs::copy(&source_path, &dest_path).map_err(|e| e.to_string())?;
 
-            let result_path = dest_path.to_str().ok_or("Invalid UTF-8 in destination path")?;
-            
-            Ok(result_path.to_string())
+            Ok(dest_path.to_str().unwrap().to_string())
         }
-        
-        None => Err("User cancelled the selection".into()),
+        None => Err("Cancelled".into()),
     }
 }

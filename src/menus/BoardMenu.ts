@@ -16,9 +16,7 @@ export function BoardMenu(event: MouseEvent, menu: HTMLDivElement, _: string) {
 
     ImageNoteNewButton.onclick = async () => {
         try {
-            const folderPath = "../public/images";
-
-            const newImagePath = await invoke('image_setter', {destinationFolder: folderPath}) as string;
+            const newImagePath = await invoke('image_setter') as string;
 
             NotesManager.createNote(event.pageX, event.pageY, NoteTypes.IMAGE, newImagePath);
         } catch (error) {

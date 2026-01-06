@@ -19,7 +19,7 @@
       }
     ],
     "security": {
-      "csp": null
+      "csp": "default-src 'self'; img-src 'self' gallery: asset: http://localhost:1420"
     }
   },
   "bundle": {
