@@ -24,13 +24,15 @@ export abstract class BaseNoteComponent {
 
     protected makeNoteBaseGraphics(Menu: MenuCreator) {
         const NoteGraphics = new Graphics()
-            .rect(this.note.position.x, this.note.position.y, this.note.sizes.width, this.note.sizes.height)
+            .rect(0, 0, this.note.sizes.width, this.note.sizes.height)
             .fill('#f8f8ff');
 
-
-        const glow = new Graphics().rect(this.note.position.x, this.note.position.y, this.note.sizes.width, this.note.sizes.height).fill('#ab9f97');
+        const glow = new Graphics().rect(0, 0, this.note.sizes.width, this.note.sizes.height).fill('#ab9f97');
 
         glow.filters = new BlurFilter({strength: 5});
+
+        this.NoteGroup.x = this.note.position.x;
+        this.NoteGroup.y = this.note.position.y;
 
         this.NoteGroup.addChildAt(NoteGraphics, 0);
         this.NoteGroup.addChildAt(glow, 0);
@@ -66,7 +68,7 @@ export abstract class BaseNoteComponent {
         if (this.dragTarget) {
             const distance = this.getDistance();
 
-            this.note.changeCoordinate(this.dragTarget.x, this.dragTarget.y);
+            this.note.changeCoordinate(this.NoteGroup.x, this.NoteGroup.y);
 
             if( this.Stage ) {
                 this.Stage.off('pointermove', this.onDragMove);
@@ -78,7 +80,6 @@ export abstract class BaseNoteComponent {
 
             return distance < MIN_DISTANCE;
         }
-
         return false;
     }
 

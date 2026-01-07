@@ -31,8 +31,7 @@ export class ImageNoteComponent extends BaseNoteComponent{
 
             if (imageSprite.width === imageSprite.height) {
                 imageSprite.width = this.note.sizes.width - 30;
-            }
-            else {
+            } else {
                 const width = Math.floor(imageSprite.width * (this.note.sizes.height / imageSprite.height));
                 imageSprite.width = width - 30;
                 this.note.sizes = {width: width, height: 300};
@@ -40,7 +39,7 @@ export class ImageNoteComponent extends BaseNoteComponent{
 
             imageSprite.height = this.note.sizes.height - 30;
 
-            imageSprite.position.set(this.note.position.x + this.note.sizes.width / 2, this.note.position.y + this.note.sizes.height / 2);
+            imageSprite.position.set(this.note.sizes.width / 2, this.note.sizes.height / 2);
 
 
             this.NoteGroup.addChild(imageSprite);

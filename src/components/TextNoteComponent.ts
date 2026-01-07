@@ -54,8 +54,8 @@ export class TextNoteComponent extends BaseNoteComponent{
             resolution: window.devicePixelRatio,
         });
 
-        text.x = this.note.position.x + padding;
-        text.y = this.note.position.y + padding;
+        text.x = padding;
+        text.y = padding;
 
         return text;
     }
@@ -97,7 +97,7 @@ export class TextNoteComponent extends BaseNoteComponent{
             this.editing.close();
         }
 
-        this.editing = new TextEditor(text, this.note);
+        this.editing = new TextEditor(text, this.note as TextN);
         this.editing.open();
 
         BoardManager.getStage()!.on('pointerdown', this.closeOnBlur);

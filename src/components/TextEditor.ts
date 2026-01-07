@@ -173,7 +173,7 @@ export class TextEditor {
                 const escapeSpaces = (s: string) => s.replace(/ /g, '\u00A0');
 
                 for (let j = 0; j < lineText.length; j++) {
-                    const charIndex = lineStart + j; // absolute index in raw text
+                    const charIndex = lineStart + j;
                     const char = lineText[j] === ' ' ? '\u00A0' : lineText[j];
                     const charWidth = CanvasTextMetrics.measureText(char, style).width;
 
@@ -183,12 +183,10 @@ export class TextEditor {
                             rectX = CanvasTextMetrics.measureText(textBefore, style).width;
                             started = true;
                         }
-                        rectWidth += charWidth; // add the width of this selected character
+                        rectWidth += charWidth;
                     }
                 }
 
-
-                // if selection starts at first character, rectX might still be zero, that's fine
                 this.selectionBg.rect(
                     this.pixiText.x + rectX,
                     this.pixiText.y + i * lineHeight,
