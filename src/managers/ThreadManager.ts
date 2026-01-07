@@ -2,6 +2,7 @@ import {makeAutoObservable} from "mobx";
 import {AdjacencyGraph} from "../threads/AdjacencyGraph.ts";
 import {BaseThread} from "../threads/BaseThread.ts";
 import {Container, ContainerChild} from "pixi.js";
+import {invoke} from "@tauri-apps/api/core";
 
 class ManagerForThreads{
     private threadGraph = new AdjacencyGraph();
@@ -10,12 +11,32 @@ class ManagerForThreads{
 
     constructor() {
         makeAutoObservable(this);
-        this.loadThreadGraph();
+        this.loadThreadGraphFromJSON().then(threads => threads.forEach(thread => this.loadThread(thread)));
     }
 
-    private loadThreadGraph() {
-        this.threadGraph.addEdge('1767744580450oor868v', '17677445804503eo2uig');
-        this.threadGraph.addEdge('1767744580450n9vcuoi', '1767744580450oor868v');
+    private async loadThreadGraphFromJSON() {
+        try {
+            return await invoke<{
+                color: string,
+                id: string,
+            }[]>("load_threads_from_json");
+        } catch (error) {
+            console.error("Failed to load threads: ", error);
+            return [];
+        }
+    }
+
+    public async SaveThreadToJSON() {
+        try {
+            await invoke('save_threads_to_json', {data: this.threadGraph.getBaseThreads()})
+        } catch (error) {
+            console.error("Could not save threads to JSON", error);
+        }
+    }
+
+    private loadThread(thread: {color: string, id: string}) {
+        const connectedNotes = this.getSeparateIDs(thread.id);
+        this.addThread(connectedNotes.originID, connectedNotes.destinationID)
     }
 
     public addThread(originID: string, destinationID: string) {
@@ -73,7 +94,7 @@ class ManagerForThreads{
     public reset() {
         this.threadGraph.destroyGraph();
         this.deletedThreads.length = 0;
-        this.loadThreadGraph();
+        this.loadThreadGraphFromJSON();
     }
 
     public destroyVisualThread(threadVisual: Container<ContainerChild>, stage: Container<ContainerChild>) {

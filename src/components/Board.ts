@@ -44,11 +44,6 @@ export class Board {
         NotesManager.getNotes().forEach(note => {ThreadManager.getThreadGraph().returnVertexMap(note.id)?.forEach((threadType, destinationID) => { if(!this.threadMap.has(threadType.getThreadID())) this.makeThreadVisual(note.id, destinationID, threadType);})});
     }
 
-    // If I make a bar, like a program bar, then this would be called from another file.
-    private saveNotes() {
-        NotesManager.SaveNoteToJSON().then(() => alert("Board has been saved"));
-    }
-
     private observerFunctionForNotes() {
         observe(NotesManager.getNotes(), (change) => {
             if (change.type === "splice") {
@@ -130,8 +125,9 @@ export class Board {
         circle.on('pointertap', (event) => {
             event.stopPropagation();
             event.preventDefault();
-            this.saveNotes()}
-        );
+            NotesManager.SaveNoteToJSON().then(() => alert("Board has been saved"));
+            ThreadManager.SaveThreadToJSON().then(() => {});
+        });
 
         this.stage.addChild(circle);
     }

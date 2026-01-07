@@ -31,7 +31,7 @@ class ManagerForNotes{
         try {
             await invoke('save_notes_to_json', {data: this.notes});
         } catch (error) {
-            console.error("Could not save to JSON", error);
+            console.error("Could not save notes to JSON", error);
         }
 
         // This function should return something to continue on the program.

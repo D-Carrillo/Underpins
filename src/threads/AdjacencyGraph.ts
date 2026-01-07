@@ -56,6 +56,10 @@ export class AdjacencyGraph {
         this.adjacentList.delete(vertexID);
     }
 
+    public getBaseThreads(): BaseThread[] {
+        return Array.from(this.adjacentList.values()).flatMap(innerMap => Array.from(innerMap.values()));
+    }
+
     public getVertexesAmount = (): number => this.adjacentList.size;
 
     public containsVertex = (vertexID: string ): boolean => this.adjacentList.has(vertexID);
