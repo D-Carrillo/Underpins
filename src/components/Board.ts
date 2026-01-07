@@ -32,8 +32,6 @@ export class Board {
         this.loadThreads();
         this.observerFunctionForNotes();
         this.observerFunctionForThreads();
-
-        this.saveNotes();
     }
 
     private loadSavedNotes(){

@@ -1,6 +1,5 @@
 import {makeAutoObservable} from "mobx";
 import {AdjacencyGraph} from "../threads/AdjacencyGraph.ts";
-import {NotesManager} from "./NoteManager.ts";
 import {BaseThread} from "../threads/BaseThread.ts";
 import {Container, ContainerChild} from "pixi.js";
 
@@ -15,7 +14,8 @@ class ManagerForThreads{
     }
 
     private loadThreadGraph() {
-
+        this.threadGraph.addEdge('1767744580450oor868v', '17677445804503eo2uig');
+        this.threadGraph.addEdge('1767744580450n9vcuoi', '1767744580450oor868v');
     }
 
     public addThread(originID: string, destinationID: string) {

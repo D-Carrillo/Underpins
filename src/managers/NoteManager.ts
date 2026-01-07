@@ -1,5 +1,5 @@
 import NoteFactory from "../factories/NoteFactory.ts";
-import { makeAutoObservable } from "mobx";
+import {makeAutoObservable} from "mobx";
 import {BaseNote} from "../notes/BaseNote.ts";
 import {BlurFilter, Container, ContainerChild, Graphics} from "pixi.js";
 import {NoteTypes} from "../factories/NoteTypesEnum.ts";
@@ -9,18 +9,19 @@ class ManagerForNotes{
     private readonly notes: BaseNote[];
 
     constructor() {
-        this.notes = this.loadNotes();
+        this.notes = [];
+        this.loadNotes().then(results => results.forEach(note => this.makeNotes(note)));
         makeAutoObservable(this);
+    }
+
+    private makeNotes(note: {type: string, create_at: number, content: string, id: string, position: {x: number, y: number}, size: {height: number, width:number}}) {
+        const loadedNote = NoteFactory.loadNote(note.type, note.position.x, note.position.y, note.content, note.id, note.create_at);
+        this.notes.push(loadedNote);
     }
 
     public getNotes(): BaseNote[] {
         return this.notes;
     }
-
-    // Functions to implement
-
-    // LoadNotesFromJSON()
-
 
     public AddANote(newNote : BaseNote){
         this.notes.push(newNote);
@@ -28,7 +29,7 @@ class ManagerForNotes{
 
     public async SaveNoteToJSON() {
         try {
-            await invoke('save_note_to_json', {data: this.notes});
+            await invoke('save_notes_to_json', {data: this.notes});
         } catch (error) {
             console.error("Could not save to JSON", error);
         }
@@ -54,9 +55,15 @@ class ManagerForNotes{
         return newNote;
     }
 
-    //Only for when we don't have JSON
-    public loadNotes(): BaseNote[] {
-        return [];
+    public async loadNotes() {
+        try {
+            const result =  await invoke<{type: string, create_at: number, content: string, id: string, position: {x: number, y: number}, size: {height: number, width:number}}[]>('load_notes_from_json');
+            console.log(result);
+            return result;
+        } catch (error) {
+            console.error("Failed to load notes: ", error);
+            return [];
+        }
     }
 
     public destroyVisualNote(noteVisual: Container<ContainerChild>) {

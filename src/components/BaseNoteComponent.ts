@@ -38,7 +38,7 @@ export abstract class BaseNoteComponent {
         this.makeDraggable();
         this.makeEditable(Menu);
 
-        this.Stage.addChild(this.NoteGroup);
+        this.Stage.addChildAt(this.NoteGroup, 0);
     }
 
     protected onDragStartHelper(event: FederatedPointerEvent) {
