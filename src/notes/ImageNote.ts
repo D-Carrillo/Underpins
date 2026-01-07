@@ -4,10 +4,13 @@ const INIT_HEIGHT = 300;
 const INIT_WIDTH = 300;
 
 export class ImageNote extends BaseNote {
-    type = "image";
+    type = "ImageNote";
 
-    constructor(imageLocation: string, x_coordinate: number, y_coordinate: number ) {
-        super(imageLocation, x_coordinate, y_coordinate, INIT_HEIGHT, INIT_WIDTH);
+    constructor(imageLocation: string, x_coordinate: number, y_coordinate: number);
+    constructor(imageLocation: string, x_coordinate: number, y_coordinate: number, id: string, createdAt: number);
+    constructor(imageLocation: string, x_coordinate: number, y_coordinate: number, id?: string, createdAt?: number) {
+
+        super(imageLocation, x_coordinate, y_coordinate, INIT_HEIGHT, INIT_WIDTH, id!, createdAt!);
     }
 
     updateContent = (imageLocation: string): void => {

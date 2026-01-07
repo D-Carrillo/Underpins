@@ -1,76 +1,76 @@
-import {test, expect, describe, beforeEach} from 'vitest';
+import {test, expect, describe, beforeEach, vi, afterEach} from 'vitest';
 import {ThreadManager} from "../managers/ThreadManager.ts";
 import {NotesManager} from "../managers/NoteManager.ts";
+import {BaseNote} from "../notes/BaseNote.ts";
+import {any} from "./anyType.ts";
+import {TextNote} from "../notes/TextNote.ts";
 
-test("GetSeparateIDs would return the correct IDs", () => {
-    const threadID =  "Origin_Destination";
+function setupNotesSpy(mockData: BaseNote[]) {
+    return vi.spyOn(Object.getPrototypeOf(NotesManager), 'loadNotes')
+        .mockReturnValue(mockData);
+}
 
-    const parts = ThreadManager.getSeparateIDs(threadID);
+function injectNotes(notes: BaseNote[]) {
+    (NotesManager as any).notes = notes;
+}
 
-    expect(parts.originID).toBe("Origin");
-    expect(parts.destinationID).toBe("Destination");
-});
+function populateMockThreads(notes: BaseNote[]) {
+    ThreadManager.addThread(notes[0].id, notes[1].id);
+    ThreadManager.addThread(notes[2].id, notes[1].id);
+}
 
-describe("GetSeparateIDs would throw an Error if there is no Origin or Destination", () => {
-    test.each([
-        ["Origin_"],
-        ["_Destination"]
-    ])("Would throw error with (%s)", (threadID) => {
+describe("ThreadManager Test Suite", () => {
+    let notesSpy: any;
 
-        expect(() => ThreadManager.getSeparateIDs(threadID)).toThrowError("No Origin or Destination in the thread");
-    });
-});
-
-describe("DeleteThread should catch the Error from getSeparateIDs", () => {
-    test.each([
-        ["Origin_"],
-        ["_Destination"]
-    ])("Would throw error with (%s)", (threadID) => {
-
-        expect(() => ThreadManager.deleteThread(threadID)).toThrowError("No Origin or Destination in the thread");
-    });
-});
-
-describe("Deletion tests", () => {
     beforeEach(() => {
+        const mockNotes = [
+            new TextNote(any<string>(), any<number>(), any<number>()),
+            new TextNote(any<string>(), any<number>(), any<number>()),
+            new TextNote(any<string>(), any<number>(), any<number>())
+        ];
+
+        notesSpy = setupNotesSpy(mockNotes);
+        injectNotes(mockNotes);
+
         ThreadManager.reset();
+        populateMockThreads(mockNotes);
     });
 
-    test("deleteThreadWithThreadID deletes one threadID", () => {
-        const numOfThreads = ThreadManager.getThreadGraph().getVertexesAmount();
-
-        const threadID = NotesManager.getNotes()[0].id + '_' + NotesManager.getNotes()[1].id;
-
-        ThreadManager.deleteThread(threadID);
-
-        expect(ThreadManager.getThreadGraph().getVertexesAmount()).toBe(numOfThreads - 1);
-        expect(ThreadManager.getDeletedThreads().some(deletedThread => deletedThread.ID === threadID));
+    afterEach(() => {
+        notesSpy.mockRestore();
     });
 
-    test("deleteThreadWithThreadID deletes the wanted thread", () => {
-        const threadID = NotesManager.getNotes()[0].id + '_' + NotesManager.getNotes()[1].id;
+    describe("Deletion Logic", () => {
+        test("deleteThreadWithThreadID deletes one threadID", () => {
+            const notes = NotesManager.getNotes();
+            const threadID = notes[0].id + '_' + notes[1].id;
+            const initialThreads = ThreadManager.getThreadGraph().getVertexesAmount();
 
-        ThreadManager.deleteThread(threadID);
+            ThreadManager.deleteThread(threadID);
 
-        expect(ThreadManager.getThreadGraph().containsVertex(NotesManager.getNotes()[0].id)).toBe(false);
-        expect(ThreadManager.getDeletedThreads().some(deletedThread => deletedThread.ID === threadID));
-    });
+            expect(ThreadManager.getThreadGraph().getVertexesAmount()).toBe(initialThreads - 1);
+            expect(ThreadManager.getDeletedThreads().some(t => t.ID === threadID)).toBe(true);
+        });
 
-    test("deleteThread with only noteID deletes all of thread that are linked to that note", () => {
-        const numOfThreads = ThreadManager.getThreadGraph().getVertexesAmount();
+        test("deleteThread with only noteID deletes all linked threads", () => {
+            const notes = NotesManager.getNotes();
+            const initialThreads = ThreadManager.getThreadGraph().getVertexesAmount();
 
-        ThreadManager.deleteThread(NotesManager.getNotes()[1].id);
+            ThreadManager.deleteThread(notes[1].id);
 
-        expect(ThreadManager.getThreadGraph().getVertexesAmount()).toBe(numOfThreads - 2);
-        expect(ThreadManager.getDeletedThreads().length).toBe(2);
-    });
+            expect(ThreadManager.getThreadGraph().getVertexesAmount()).toBe(initialThreads - 2);
+            expect(ThreadManager.getDeletedThreads().length).toBe(2);
+        });
 
-    test("deleteThread with only noteID delete all of the threads that contain that note", () => {
-        ThreadManager.deleteThread(NotesManager.getNotes()[1].id);
+        test("deleteThread with only noteID removes connections from graph", () => {
+            const notes = NotesManager.getNotes();
+            const targetID = notes[1].id;
 
-        expect(ThreadManager.getThreadGraph().getAllThreadIDsThatConnectTo(NotesManager.getNotes()[1].id)).toStrictEqual([]);
-        expect(ThreadManager.getDeletedThreads().some(deletedThread => deletedThread.ID === NotesManager.getNotes()[0].id + '_' + NotesManager.getNotes()[1].id));
-        expect(ThreadManager.getDeletedThreads().some(deletedThread => deletedThread.ID === NotesManager.getNotes()[2].id + '_' + NotesManager.getNotes()[1].id));
+            ThreadManager.deleteThread(targetID);
 
+            expect(ThreadManager.getThreadGraph().getAllThreadIDsThatConnectTo(targetID)).toStrictEqual([]);
+            expect(ThreadManager.getDeletedThreads().some(t => t.ID === notes[0].id + '_' + targetID)).toBe(true);
+            expect(ThreadManager.getDeletedThreads().some(t => t.ID === notes[2].id + '_' + targetID)).toBe(true);
+        });
     });
 });

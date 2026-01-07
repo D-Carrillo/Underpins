@@ -32,6 +32,8 @@ export class Board {
         this.loadThreads();
         this.observerFunctionForNotes();
         this.observerFunctionForThreads();
+
+        this.saveNotes();
     }
 
     private loadSavedNotes(){
@@ -40,6 +42,10 @@ export class Board {
 
     private loadThreads() {
         NotesManager.getNotes().forEach(note => {ThreadManager.getThreadGraph().returnVertexMap(note.id)?.forEach((threadType, destinationID) => { if(!this.threadMap.has(threadType.getThreadID())) this.makeThreadVisual(note.id, destinationID, threadType);})});
+    }
+
+    private saveNotes() {
+        NotesManager.SaveNoteToJSON();
     }
 
     private observerFunctionForNotes() {

@@ -18,8 +18,8 @@ export function BaseNoteSharedTests<T extends BaseNote>(NoteClass: Constructor<T
             const note = new NoteClass(any<string>(), any<number>(), any<number>());
             const after = Date.now();
 
-            expect(note.createAt).toBeGreaterThanOrEqual(before);
-            expect(note.createAt).toBeLessThanOrEqual(after);
+            expect(note.create_at).toBeGreaterThanOrEqual(before);
+            expect(note.create_at).toBeLessThanOrEqual(after);
         });
 
 

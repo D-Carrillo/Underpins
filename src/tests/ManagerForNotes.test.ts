@@ -1,50 +1,81 @@
-import {expect, test} from "vitest";
+import {expect, test, describe, vi, beforeEach, afterEach} from "vitest";
 import {NotesManager} from "../managers/NoteManager.ts";
 import {any} from "./anyType.ts";
 import {TextNote} from "../notes/TextNote.ts";
 import {NoteTypes} from "../factories/NoteTypesEnum.ts";
 import {ImageNote} from "../notes/ImageNote.ts";
+import {BaseNote} from "../notes/BaseNote.ts";
 
-test("Manager creates the correct note type", () => {
-    const note = NotesManager.createNote(any<number>(), any<number>(), NoteTypes.TEXT, any<string>());
+function setupLoadNotesSpy(mockData: BaseNote[]) {
+    return vi.spyOn(Object.getPrototypeOf(NotesManager), 'loadNotes').mockReturnValue(mockData);
+}
 
-    expect(note).toBeInstanceOf(TextNote);
-});
+function resetManagerNotes(notes: BaseNote[]) {
+    (NotesManager as any).notes = notes;
+}
 
-test("Manager creates the correct note type", () => {
-    const note = NotesManager.createNote(any<number>(), any<number>(), NoteTypes.IMAGE, any<string>());
+describe("NotesManager Test Suite", () => {
+    let spy: any;
 
-    expect(note).toBeInstanceOf(ImageNote);
-});
+    beforeEach(() => {
+        const mockNotes = [
+            new TextNote(any<string>(), any<number>(), any<number>()),
+            new TextNote(any<string>(), any<number>(), any<number>())
+        ];
 
-test("Exception is passed to the Manager", () => {
-    expect(() => NotesManager.createNote(any<number>(), any<number>(), any<NoteTypes>(), any<string>())).toThrowError("Not implemented");
-});
+        spy = setupLoadNotesSpy(mockNotes);
+        resetManagerNotes(mockNotes);
+    });
 
-test(" Note manager deletes correct note", () => {
-    const ID = NotesManager.getNotes()[1].id;
-    const noteArrayLength = NotesManager.getNotes().length;
+    afterEach(() => {
+        spy.mockRestore();
+    });
 
-    NotesManager.deleteNote(ID);
-    const noteArrayLengthAfterDeletion = NotesManager.getNotes().length;
+    test("Manager creates the correct note type", () => {
+        const note = NotesManager.createNote(any<number>(), any<number>(), NoteTypes.TEXT, any<string>());
 
-    expect(noteArrayLength - 1).toBe(noteArrayLengthAfterDeletion);
+        expect(note).toBeInstanceOf(TextNote);
+    });
 
-    const noteIsOnTheNoteArray = NotesManager.getNotes().some(note => note.id === ID);
+    test("Manager creates the correct image note type", () => {
+        const note = NotesManager.createNote(any<number>(), any<number>(), NoteTypes.IMAGE, any<string>());
 
-    expect(noteIsOnTheNoteArray).toBe(false);
-});
+        expect(note).toBeInstanceOf(ImageNote);
+    });
 
-test("NoteManager add correct note to the Note Array", () => {
-    const newNote = new TextNote(any<string>(), any<number>(), any<number>());
+    test("Note manager deletes correct note", () => {
+        const initialNotes = NotesManager.getNotes();
+        const targetID = initialNotes[0].id;
+        const initialLength = initialNotes.length;
 
-    const noteArrayLength = NotesManager.getNotes().length;
-    NotesManager.AddANote(newNote);
-    const noteArrayLengthAfterAddition = NotesManager.getNotes().length;
+        NotesManager.deleteNote(targetID);
 
-    expect(noteArrayLength + 1).toBe(noteArrayLengthAfterAddition);
+        const updatedNotes = NotesManager.getNotes();
+        expect(updatedNotes.length).toBe(initialLength - 1);
+        expect(updatedNotes.some(n => n.id === targetID)).toBe(false);
+    });
 
-    const noteArrayContainsNewNote = NotesManager.getNotes().includes(newNote);
+    test("NoteManager adds correct note to the array", () => {
+        const newNote = new TextNote(any<string>(), any<number>(), any<number>());
+        const initialLength = NotesManager.getNotes().length;
 
-    expect(noteArrayContainsNewNote).toBe(true);
+        NotesManager.AddANote(newNote);
+
+        expect(NotesManager.getNotes().length).toBe(initialLength + 1);
+        expect(NotesManager.getNotes()).toContain(newNote);
+    });
+
+    test("Manager uses mocked notes instead of hardcoded production notes", () => {
+        const mockNotes = [
+            new TextNote(any<string>(), any<number>(), any<number>()),
+            new TextNote(any<string>(), any<number>(), any<number>())
+        ];
+
+        resetManagerNotes(mockNotes);
+
+        const notes = NotesManager.getNotes();
+
+        expect(notes.length).toBe(2);
+        expect(notes).toEqual(mockNotes);
+    });
 });

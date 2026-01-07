@@ -5,11 +5,13 @@ const INIT_WIDTH = 250;
 const NOTE_CONTENT_LIMIT = 270;
 
 export class TextNote extends BaseNote {
-    type = "text";
+    type = "TextNote";
 
-    constructor(content: string, x_coordinate: number, y_coordinate: number)
-    {
-        super(content, x_coordinate, y_coordinate, INIT_HEIGHT, INIT_WIDTH);
+    constructor(content: string, x_coordinate: number, y_coordinate: number);
+    constructor(content: string, x_coordinate: number, y_coordinate: number, id: string, createdAt: number);
+    constructor(content: string, x_coordinate: number, y_coordinate: number, id?: string, createdAt?: number) {
+
+        super(content, x_coordinate, y_coordinate, INIT_HEIGHT, INIT_WIDTH, id!, createdAt!);
     }
 
     updateContent = (newContent: string) => {

@@ -1,10 +1,9 @@
-import {TextNote} from "../notes/TextNote.ts";
 import NoteFactory from "../factories/NoteFactory.ts";
 import { makeAutoObservable } from "mobx";
 import {BaseNote} from "../notes/BaseNote.ts";
 import {BlurFilter, Container, ContainerChild, Graphics} from "pixi.js";
-import {ImageNote} from "../notes/ImageNote.ts";
 import {NoteTypes} from "../factories/NoteTypesEnum.ts";
+import {invoke} from "@tauri-apps/api/core";
 
 class ManagerForNotes{
     private readonly notes: BaseNote[];
@@ -27,7 +26,15 @@ class ManagerForNotes{
         this.notes.push(newNote);
     }
 
-    // SaveNoteToJSON()
+    public async SaveNoteToJSON() {
+        try {
+            await invoke('save_note_to_json', {data: this.notes});
+        } catch (error) {
+            console.error("Could not save to JSON", error);
+        }
+
+        // This function should return something to continue on the program.
+    }
 
     public deleteNote(id: string) {
         const deletingNoteIndex = this.notes.findIndex(note => note.id === id);
@@ -49,7 +56,7 @@ class ManagerForNotes{
 
     //Only for when we don't have JSON
     public loadNotes(): BaseNote[] {
-        return [new TextNote("Type Here", 100, 200), new TextNote("Type here \n and here", 400, 100), new TextNote("This is the third \n note", 400, 300), new ImageNote('/home/seraph/.local/share/com.diego.underpins/assets/323131.jpg', 700, 200)];
+        return [];
     }
 
     public destroyVisualNote(noteVisual: Container<ContainerChild>) {
