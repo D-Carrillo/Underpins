@@ -1,4 +1,4 @@
-import {Application, Container, ContainerChild} from "pixi.js";
+import {Application, Container, ContainerChild, Graphics} from "pixi.js";
 import {TextNoteComponent} from "./TextNoteComponent.ts";
 import {NotesManager} from "../managers/NoteManager.ts";
 import {observe, reaction} from "mobx";
@@ -11,6 +11,7 @@ import {BoardManager} from "../managers/BoardManager.ts";
 import {BaseNote} from "../notes/BaseNote.ts";
 import {TextNote} from "../notes/TextNote.ts";
 import {ImageNoteComponent} from "./ImageNoteComponent.ts";
+import {ImageNote} from "../notes/ImageNote.ts";
 
 export class Board {
     private readonly stage: Container<ContainerChild>
@@ -30,6 +31,7 @@ export class Board {
         this.loadMenu();
         this.loadSavedNotes();
         this.loadThreads();
+        this.saveButton();
         this.observerFunctionForNotes();
         this.observerFunctionForThreads();
     }
@@ -42,8 +44,9 @@ export class Board {
         NotesManager.getNotes().forEach(note => {ThreadManager.getThreadGraph().returnVertexMap(note.id)?.forEach((threadType, destinationID) => { if(!this.threadMap.has(threadType.getThreadID())) this.makeThreadVisual(note.id, destinationID, threadType);})});
     }
 
+    // If I make a bar, like a program bar, then this would be called from another file.
     private saveNotes() {
-        NotesManager.SaveNoteToJSON();
+        NotesManager.SaveNoteToJSON().then(() => alert("Board has been saved"));
     }
 
     private observerFunctionForNotes() {
@@ -92,11 +95,14 @@ export class Board {
     private createVisualNote(note: BaseNote) {
         let singularNoteContainer: Container;
 
-        // Need to make a factory
+        // Need to make a factory for the components - One
         if (note instanceof TextNote) {
             singularNoteContainer = new TextNoteComponent(note, this.stage).makeNote();
-        } else {
+        } else if (note instanceof ImageNote){
             singularNoteContainer = new ImageNoteComponent(note, this.stage).makeNote();
+        }
+        else {
+            throw Error("Instance was not of any know type of note");
         }
 
         this.noteMap.set(note.id, singularNoteContainer);
@@ -113,5 +119,20 @@ export class Board {
                 useContextMenu(event.nativeEvent as MouseEvent, BoardMenu, "note");
             }
         })
+    }
+
+    private saveButton() {
+        const circle = new Graphics().circle(100, 100, 20).fill(0x00000);
+
+        circle.eventMode = 'static';
+        circle.cursor = 'pointer';
+
+        circle.on('pointertap', (event) => {
+            event.stopPropagation();
+            event.preventDefault();
+            this.saveNotes()}
+        );
+
+        this.stage.addChild(circle);
     }
 }

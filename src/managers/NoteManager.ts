@@ -57,9 +57,14 @@ class ManagerForNotes{
 
     public async loadNotes() {
         try {
-            const result =  await invoke<{type: string, create_at: number, content: string, id: string, position: {x: number, y: number}, size: {height: number, width:number}}[]>('load_notes_from_json');
-            console.log(result);
-            return result;
+            return await invoke<{
+                type: string,
+                create_at: number,
+                content: string,
+                id: string,
+                position: { x: number, y: number },
+                size: { height: number, width: number }
+            }[]>('load_notes_from_json');
         } catch (error) {
             console.error("Failed to load notes: ", error);
             return [];
