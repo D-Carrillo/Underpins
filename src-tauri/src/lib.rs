@@ -1,8 +1,10 @@
 use std::fs;
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-mod imagefun;
+mod image_setter;
 mod note_saving;
+mod thread_saving;
+mod save_and_load_functions;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -28,7 +30,7 @@ pub fn run() {
                 .unwrap(),
         }
     })
-        .invoke_handler(tauri::generate_handler![imagefun::image_setter, note_saving::save_notes_to_json, note_saving::load_notes_from_json])
+        .invoke_handler(tauri::generate_handler![image_setter::image_setter, note_saving::save_notes_to_json, note_saving::load_notes_from_json])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

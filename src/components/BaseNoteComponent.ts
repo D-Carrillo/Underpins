@@ -53,7 +53,6 @@ export abstract class BaseNoteComponent {
         this.offset.y = this.NoteGroup.y - localPos.y;
 
         this.Stage.on('pointermove', this.onDragMove);
-
     }
 
     private onDragMove=  (event: FederatedPointerEvent) => {
