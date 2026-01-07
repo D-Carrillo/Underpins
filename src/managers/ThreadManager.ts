@@ -94,7 +94,6 @@ class ManagerForThreads{
     public reset() {
         this.threadGraph.destroyGraph();
         this.deletedThreads.length = 0;
-        this.loadThreadGraphFromJSON();
     }
 
     public destroyVisualThread(threadVisual: Container<ContainerChild>, stage: Container<ContainerChild>) {

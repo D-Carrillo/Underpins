@@ -1,5 +1,6 @@
 import { Application } from 'pixi.js';
-import {Board} from "./components/Board.ts";
+import {showMenu} from "./MainMenu/showMenu.ts";
+import {loadFonts, prepareBitmapFont} from "../fonts/loadFonts.ts";
 
 const app = new Application();
 
@@ -15,12 +16,9 @@ async function init() {
 
   document.body.appendChild(app.canvas);
 
-
-  const myBoard = new Board(app);
-
-  app.ticker.add(() => {
-    myBoard.update();
-  })
+  await loadFonts();
+  await prepareBitmapFont();
+  showMenu(app);
 }
 
 init();

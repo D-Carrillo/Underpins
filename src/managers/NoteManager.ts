@@ -33,8 +33,6 @@ class ManagerForNotes{
         } catch (error) {
             console.error("Could not save notes to JSON", error);
         }
-
-        // This function should return something to continue on the program.
     }
 
     public deleteNote(id: string) {
@@ -42,12 +40,7 @@ class ManagerForNotes{
         if (deletingNoteIndex !== -1) {
             this.notes.splice(deletingNoteIndex,1);
         }
-
-        //For the note that is being deleted, you have to call the database or JSON to delete from its system by passing the ID
-        // Might not need, for a JSON we could just remake the json with the new notes array, maybe on a database the implementation might be different.
     }
-
-    // DeleteNoteFromJSON()
 
     public createNote(x: number, y: number, type: NoteTypes, content: string) {
         const newNote = NoteFactory.makeNote(x, y, type, content);
