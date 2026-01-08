@@ -28,7 +28,7 @@ async function init() {
     myBoard.update();
   });
 
-  new toolMenu(app);
+   new toolMenu(app);
 }
 
 init();

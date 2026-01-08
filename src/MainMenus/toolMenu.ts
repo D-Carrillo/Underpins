@@ -11,35 +11,41 @@ export class toolMenu
 
     constructor(app: Application) {
         this.app = app;
-        this.saveButton();
+        this.makeToolBar();
     }
 
-    private saveButton() {
-        const container = new Container();
+    private makeToolBar() {
+        const toolBar = new Container();
 
-        this.toolSquare(container);
-        this.addSaveIcon(container).then();
+        this.saveButton(toolBar);
 
-        container.eventMode = 'static';
-        container.cursor = 'pointer';
+        toolBar.eventMode = 'static';
+        toolBar.cursor = 'pointer';
 
-        container.position.set(10, this.app.screen.height / 2 - 50);
+        toolBar.position.set(10, this.app.screen.height / 2 - 50);
 
         const stayInMiddle = () => {
-            container.position.set(10, this.app.screen.height / 2 - 50);
+            toolBar.position.set(10, this.app.screen.height / 2 - 50);
         }
 
         const resizeObserver = new ResizeObserver(entries => {
-           for (let _ of entries) {
-               stayInMiddle();
-           }
+            for (let _ of entries) {
+                stayInMiddle();
+            }
         });
 
         resizeObserver.observe(document.documentElement);
 
-        // Still need to remove the event Listener if it allows to create more boards.
+        BoardManager.getStage()!.addChild(toolBar);
+    }
 
-        container.on('pointertap', (event) => {
+    private saveButton(toolBar: Container) {
+        const saveButton = new Container();
+
+        this.toolSquare(saveButton);
+        this.addIcon(saveButton, 'saveIcon.png').then();
+
+        saveButton.on('pointertap', (event) => {
             event.stopPropagation();
             event.preventDefault();
             NotesManager.SaveNoteToJSON().then(() => alert("Board has been saved"));
@@ -47,19 +53,19 @@ export class toolMenu
             });
         });
 
-        BoardManager.getStage()!.addChild(container);
+        toolBar.addChild(saveButton);
     }
 
-    private toolSquare(container: Container) {
+    private toolSquare(saveButton: Container) {
         const rect = new Graphics().roundRect(0, 0, SIZE, SIZE, 10).fill('#232023');
 
         rect.roundPixels = true;
 
-        container.addChild(rect);
+        saveButton.addChild(rect);
     }
 
-    private async addSaveIcon(container: Container) {
-        const texture = await Assets.load('/saveIcon.png');
+    private async addIcon(saveButton: Container, iconPath: String) {
+        const texture = await Assets.load(iconPath);
         const saveIcon = new Sprite(texture);
 
         saveIcon.roundPixels = true;
@@ -68,6 +74,6 @@ export class toolMenu
         saveIcon.scale.set(0.02);
         saveIcon.position.set(SIZE / 2, SIZE / 2);
 
-        container.addChild(saveIcon);
+        saveButton.addChild(saveIcon);
     }
 }
