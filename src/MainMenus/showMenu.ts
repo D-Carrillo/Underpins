@@ -1,4 +1,4 @@
-import {Application, BitmapText, Container, Graphics, TextStyle, Ticker} from "pixi.js";
+import {Application, BitmapText, Container, Graphics, TextStyle} from "pixi.js";
 import {Board} from "../components/Board.ts";
 
 export function showMenu(app: Application) {
@@ -26,26 +26,23 @@ export function showMenu(app: Application) {
     startButton.cursor = "pointer";
     startButton.on("pointerdown", (event) => {
         event.stopPropagation();
+        window.removeEventListener('resize', stayInMiddle);
         menuContainer.destroy({children: true});
-        startGame(app);
+        startBoard(app);
     });
 
     const stayInMiddle = () => {
-        if(!startButton.parent) {
-            Ticker.shared.remove(stayInMiddle);
-            return;
-        }
         menuContainer.position.set(app.screen.width / 2 - 100, app.screen.height / 2  - 50);
     }
 
-    Ticker.shared.add(stayInMiddle);
+    window.addEventListener('resize', stayInMiddle);
 
     menuContainer.addChild(startButton);
     menuContainer.addChild(loadText);
 
 }
 
-function startGame(app: Application) {
+function startBoard(app: Application) {
     const myBoard = new Board(app);
     app.ticker.add(() => {
         myBoard.update();

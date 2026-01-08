@@ -3,7 +3,6 @@ import {NoteTypes} from "./NoteTypesEnum.ts";
 import {BaseNote} from "../notes/BaseNote.ts";
 import {ImageNote} from "../notes/ImageNote.ts";
 
-
 class NoteFactory {
     public static makeNote(x: number, y: number, type: NoteTypes, content: string): BaseNote {
         if ( type === NoteTypes.TEXT) {

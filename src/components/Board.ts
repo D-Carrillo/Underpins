@@ -1,4 +1,4 @@
-import {Application, Container, ContainerChild, Graphics} from "pixi.js";
+import {Application, Container, ContainerChild} from "pixi.js";
 import {TextNoteComponent} from "./TextNoteComponent.ts";
 import {NotesManager} from "../managers/NoteManager.ts";
 import {observe, reaction} from "mobx";
@@ -28,10 +28,10 @@ export class Board {
         BoardManager.setNoteMap(() => this.noteMap);
         BoardManager.setStage(this.stage);
 
+        // Put a loading image to make sure the threads are not seen all over the place, but only when the board has fully loaded.
         this.loadMenu();
         this.loadSavedNotes();
         this.loadThreads();
-        this.saveButton();
         this.observerFunctionForNotes();
         this.observerFunctionForThreads();
     }
@@ -114,21 +114,5 @@ export class Board {
                 useContextMenu(event.nativeEvent as MouseEvent, BoardMenu, "note");
             }
         })
-    }
-
-    private saveButton() {
-        const circle = new Graphics().circle(100, 100, 20).fill(0x00000);
-
-        circle.eventMode = 'static';
-        circle.cursor = 'pointer';
-
-        circle.on('pointertap', (event) => {
-            event.stopPropagation();
-            event.preventDefault();
-            NotesManager.SaveNoteToJSON().then(() => alert("Board has been saved"));
-            ThreadManager.SaveThreadToJSON().then(() => {});
-        });
-
-        this.stage.addChild(circle);
     }
 }

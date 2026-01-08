@@ -7,9 +7,11 @@ import {invoke} from "@tauri-apps/api/core";
 
 class ManagerForNotes{
     private readonly notes: BaseNote[];
+    private deletedNotes: BaseNote[];
 
     constructor() {
         this.notes = [];
+        this.deletedNotes = [];
         this.loadNotes().then(results => results.forEach(note => this.makeNotes(note)));
         makeAutoObservable(this);
     }
@@ -38,7 +40,11 @@ class ManagerForNotes{
     public deleteNote(id: string) {
         const deletingNoteIndex = this.notes.findIndex(note => note.id === id);
         if (deletingNoteIndex !== -1) {
-            this.notes.splice(deletingNoteIndex,1);
+            const deletedNote = this.notes.splice(deletingNoteIndex,1);
+
+            if (this.deletedNotes.length === 0) {
+                this.deletedNotes.push(deletedNote[0]);
+            }
         }
     }
 
