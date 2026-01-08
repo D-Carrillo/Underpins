@@ -65,7 +65,6 @@ export class TextNoteComponent extends BaseNoteComponent{
             setTimeout(() => {
                 BoardManager.getStage()!.off('pointerdown', this.closeOnBlur);
             }, 0);
-
             this.editing.close();
             this.editing = null;
         }
@@ -104,10 +103,17 @@ export class TextNoteComponent extends BaseNoteComponent{
     }
 
     private closeOnBlur = (event: FederatedPointerEvent) => {
-        const bounds = this.NoteGroup.getBounds();
+        if(!(this.NoteGroup.children.length === 0)) {
+            if (this.NoteGroup) {
+                const bounds = this.NoteGroup.getBounds();
 
-        if (!bounds.containsPoint(event.globalX, event.globalY)) {
-            this.closeEditor();
+                if (!bounds.containsPoint(event.globalX, event.globalY)) {
+                    this.closeEditor();
+                }
+            }
+        } else {
+            BoardManager.getStage()!.off('pointerdown', this.closeOnBlur);
+            this.NoteGroup.destroy({children: true});
         }
     }
 }

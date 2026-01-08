@@ -42,7 +42,7 @@ class ManagerForNotes{
         if (deletingNoteIndex !== -1) {
             const deletedNote = this.notes.splice(deletingNoteIndex,1);
 
-            if (this.deletedNotes.length === 0) {
+            if (deletedNote.length === 1) {
                 this.deletedNotes.push(deletedNote[0]);
             }
         }
@@ -95,6 +95,16 @@ class ManagerForNotes{
                 glowChild.destroy({children: true});
             }
         });
+    }
+
+    public redoDeletedNote() {
+        const lastDeletedNote = this.deletedNotes.pop();
+
+        if (lastDeletedNote) {
+            this.makeNotes({type: lastDeletedNote.type, create_at: lastDeletedNote.create_at, content: lastDeletedNote.content, id: lastDeletedNote.id, position: lastDeletedNote.position, size: lastDeletedNote.sizes});
+        }
+
+        return null;
     }
 }
 

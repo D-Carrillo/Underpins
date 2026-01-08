@@ -51,7 +51,8 @@ export class toolMenu
         redoButton.on('pointertap', (event) => {
             event.stopPropagation();
             event.preventDefault();
-            alert('The redo button has been clicked but not implemented');
+
+            NotesManager.redoDeletedNote();
         });
 
         toolBar.addChild(redoButton);

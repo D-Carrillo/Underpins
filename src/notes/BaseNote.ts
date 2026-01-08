@@ -15,10 +15,12 @@ export abstract class BaseNote
     id: string;
     position: coordinates;
     sizes: size;
+    type: string;
 
-    protected constructor(content: string, x_coordinate: number, y_coordinate: number, height: number, width: number);
-    protected constructor(content: string, x_coordinate: number, y_coordinate: number, height: number, width: number, id: string, createdAt: number);
-    protected constructor(content: string, x_coordinate: number, y_coordinate: number, height: number, width: number, id?: string, createdAt?: number) {
+    protected constructor(type: string, content: string, x_coordinate: number, y_coordinate: number, height: number, width: number);
+    protected constructor(type: string, content: string, x_coordinate: number, y_coordinate: number, height: number, width: number, id: string, createdAt: number);
+    protected constructor(type: string, content: string, x_coordinate: number, y_coordinate: number, height: number, width: number, id?: string, createdAt?: number) {
+        this.type = type;
         this.create_at = createdAt || Date.now();
         this.content = content ;
         this.id = id || `${this.create_at}` + `${Math.random().toString(36).substring(2,9)}`;

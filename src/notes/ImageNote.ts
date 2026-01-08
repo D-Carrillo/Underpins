@@ -10,7 +10,7 @@ export class ImageNote extends BaseNote {
     constructor(imageLocation: string, x_coordinate: number, y_coordinate: number, id: string, createdAt: number);
     constructor(imageLocation: string, x_coordinate: number, y_coordinate: number, id?: string, createdAt?: number) {
 
-        super(imageLocation, x_coordinate, y_coordinate, INIT_HEIGHT, INIT_WIDTH, id!, createdAt!);
+        super('ImageNote', imageLocation, x_coordinate, y_coordinate, INIT_HEIGHT, INIT_WIDTH, id!, createdAt!);
     }
 
     updateContent = (imageLocation: string): void => {
