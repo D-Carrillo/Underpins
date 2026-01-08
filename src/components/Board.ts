@@ -69,7 +69,7 @@ export class Board {
             const newlyDeletedID = Array.from(ThreadManager.getDeletedThreads()).slice(oldLength);
 
             newlyDeletedID.forEach((thread) => {
-                const threadID= thread.ID;
+                const threadID= thread.threadType.getThreadID();
                 const visualThread = this.threadMap.get(threadID);
 
                 if (visualThread) {

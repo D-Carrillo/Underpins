@@ -6,7 +6,7 @@ import {invoke} from "@tauri-apps/api/core";
 
 class ManagerForThreads{
     private threadGraph = new AdjacencyGraph();
-    private deletedThreads : {ID: string, threadType: BaseThread}[] = [];
+    private deletedThreads : {threadType: BaseThread, date: Date}[] = [];
     private recentlyAdded : string[] = [];
 
     constructor() {
@@ -62,13 +62,12 @@ class ManagerForThreads{
         if (ID.includes('_')) {
             this.deleteThreadWithThreadID(ID);
         }
-
         else{
             this.deleteThreadsWithOnlyNoteID(ID);
         }
     }
 
-    public getDeletedThreads = (): {ID: string, threadType: BaseThread}[] => this.deletedThreads;
+    public getDeletedThreads = (): {threadType: BaseThread, date: Date}[] => this.deletedThreads;
 
     public getRecentlyAddedThreads = (): string[] => this.recentlyAdded;
 
@@ -85,7 +84,7 @@ class ManagerForThreads{
     private deleteThreadWithThreadID(threadID: string) {
         const parts = this.getSeparateIDs(threadID);
 
-        this.deletedThreads.push({ID: threadID,  threadType: this.threadGraph.returnVertexMap(parts.originID)?.get(parts.destinationID)!});
+        this.deletedThreads.push({threadType: this.threadGraph.returnVertexMap(parts.originID)?.get(parts.destinationID)!, date: new Date()});
 
         this.threadGraph.removeEdge(parts.originID, parts.destinationID);
     }
@@ -101,7 +100,16 @@ class ManagerForThreads{
 
         threadVisual.destroy({
             children: true,
-            texture: false,
+        });
+    }
+
+    public restoreDeletedThreads(deletedDate: Date) {
+        this.deletedThreads.forEach((thread) => {
+            if (thread.date.getSeconds() === deletedDate.getSeconds()) {
+                const notes = this.getSeparateIDs(thread.threadType.getThreadID());
+                this.threadGraph.addEdge(notes.originID, notes.destinationID, thread.threadType);
+                this.recentlyAdded.push(notes.originID + '_' + notes.destinationID);
+            }
         });
     }
 }

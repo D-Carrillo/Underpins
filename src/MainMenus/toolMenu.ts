@@ -52,7 +52,11 @@ export class toolMenu
             event.stopPropagation();
             event.preventDefault();
 
-            NotesManager.redoDeletedNote();
+            const deletedNote = NotesManager.redoDeletedNote();
+
+            if (deletedNote) {
+                ThreadManager.restoreDeletedThreads(deletedNote);
+            }
         });
 
         toolBar.addChild(redoButton);

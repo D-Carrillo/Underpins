@@ -49,7 +49,7 @@ describe("ThreadManager Test Suite", () => {
             ThreadManager.deleteThread(threadID);
 
             expect(ThreadManager.getThreadGraph().getVertexesAmount()).toBe(initialThreads - 1);
-            expect(ThreadManager.getDeletedThreads().some(t => t.ID === threadID)).toBe(true);
+            expect(ThreadManager.getDeletedThreads().some(t => t.threadType.getThreadID() === threadID)).toBe(true);
         });
 
         test("deleteThread with only noteID deletes all linked threads", () => {
@@ -69,8 +69,8 @@ describe("ThreadManager Test Suite", () => {
             ThreadManager.deleteThread(targetID);
 
             expect(ThreadManager.getThreadGraph().getAllThreadIDsThatConnectTo(targetID)).toStrictEqual([]);
-            expect(ThreadManager.getDeletedThreads().some(t => t.ID === notes[0].id + '_' + targetID)).toBe(true);
-            expect(ThreadManager.getDeletedThreads().some(t => t.ID === notes[2].id + '_' + targetID)).toBe(true);
+            expect(ThreadManager.getDeletedThreads().some(t => t.threadType.getThreadID() === notes[0].id + '_' + targetID)).toBe(true);
+            expect(ThreadManager.getDeletedThreads().some(t => t.threadType.getThreadID() === notes[2].id + '_' + targetID)).toBe(true);
         });
     });
 });

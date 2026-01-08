@@ -29,7 +29,6 @@ export class ThreadComponent {
     }
 
     public makeThreadWithPins(stage: Container<ContainerChild> ): Container<ContainerChild> {
-
         const container = new Container();
 
         const line = this.makeLineVisual(container);

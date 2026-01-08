@@ -6,12 +6,10 @@ import {NoteTypes} from "../factories/NoteTypesEnum.ts";
 import {invoke} from "@tauri-apps/api/core";
 
 class ManagerForNotes{
-    private readonly notes: BaseNote[];
-    private deletedNotes: BaseNote[];
+    private readonly notes: BaseNote[] = [];
+    private deletedNotes: {note: BaseNote, date: Date}[]= [];
 
     constructor() {
-        this.notes = [];
-        this.deletedNotes = [];
         this.loadNotes().then(results => results.forEach(note => this.makeNotes(note)));
         makeAutoObservable(this);
     }
@@ -43,7 +41,7 @@ class ManagerForNotes{
             const deletedNote = this.notes.splice(deletingNoteIndex,1);
 
             if (deletedNote.length === 1) {
-                this.deletedNotes.push(deletedNote[0]);
+                this.deletedNotes.push({note: deletedNote[0],  date: new Date()});
             }
         }
     }
@@ -97,14 +95,14 @@ class ManagerForNotes{
         });
     }
 
-    public redoDeletedNote() {
+    public redoDeletedNote(): Date | null {
         const lastDeletedNote = this.deletedNotes.pop();
 
         if (lastDeletedNote) {
-            this.makeNotes({type: lastDeletedNote.type, create_at: lastDeletedNote.create_at, content: lastDeletedNote.content, id: lastDeletedNote.id, position: lastDeletedNote.position, size: lastDeletedNote.sizes});
+            this.makeNotes({type: lastDeletedNote.note.type, create_at: lastDeletedNote.note.create_at, content: lastDeletedNote.note.content, id: lastDeletedNote.note.id, position: lastDeletedNote.note.position, size: lastDeletedNote.note.sizes});
         }
 
-        return null;
+        return lastDeletedNote?.date || null;
     }
 }
 

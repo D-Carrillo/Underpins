@@ -13,16 +13,15 @@ export class AdjacencyGraph {
         }
     }
 
-    public addEdge(vertexID: string, destinationVertexID: string) {
+    public addEdge(vertexID:string, destinationVertexID: string, baseThread?: BaseThread){
         if (!this.adjacentList.has(vertexID)) {
             this.addVertex(vertexID);
         }
 
         if (this.adjacentList.get(vertexID)?.has(destinationVertexID) || this.adjacentList.get(destinationVertexID)?.has(vertexID)){ return }
 
-        this.adjacentList.get(vertexID)?.set(destinationVertexID, new BaseThread(vertexID + '_' + destinationVertexID));
+        this.adjacentList.get(vertexID)?.set(destinationVertexID, baseThread  || new BaseThread(vertexID + '_' + destinationVertexID));
     }
-
 
     public getAllThreadIDsThatConnectTo(targetID: string): string[] {
         const matchingPairs: string[] = [];
