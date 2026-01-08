@@ -29,7 +29,13 @@ export class toolMenu
             container.position.set(10, this.app.screen.height / 2 - 50);
         }
 
-        window.addEventListener('resize', stayInMiddle);
+        const resizeObserver = new ResizeObserver(entries => {
+           for (let _ of entries) {
+               stayInMiddle();
+           }
+        });
+
+        resizeObserver.observe(document.documentElement);
 
         // Still need to remove the event Listener if it allows to create more boards.
 
@@ -55,6 +61,8 @@ export class toolMenu
     private async addSaveIcon(container: Container) {
         const texture = await Assets.load('/saveIcon.png');
         const saveIcon = new Sprite(texture);
+
+        saveIcon.roundPixels = true;
 
         saveIcon.anchor.set(0.5);
         saveIcon.scale.set(0.02);
