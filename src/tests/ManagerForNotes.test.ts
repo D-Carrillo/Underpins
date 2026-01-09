@@ -1,4 +1,4 @@
-import {expect, test, describe, vi, beforeEach, afterEach} from "vitest";
+import {afterEach, beforeEach, describe, expect, test, vi} from "vitest";
 import {NotesManager} from "../managers/NoteManager.ts";
 import {any} from "./anyType.ts";
 import {TextNote} from "../notes/TextNote.ts";
@@ -77,5 +77,19 @@ describe("NotesManager Test Suite", () => {
 
         expect(notes.length).toBe(2);
         expect(notes).toEqual(mockNotes);
+    });
+
+    test("The Redo function returns the last deleted note", () => {
+        const newNoteToDelete = NotesManager.createNote(any<number>(),  any<number>(), NoteTypes.TEXT,  any<string>());
+
+        const before =  Date.now();
+        NotesManager.deleteNote(newNoteToDelete.id);
+        const after =  Date.now();
+
+        const restoredNote = NotesManager.redoDeletedNote();
+
+        expect(restoredNote).not.toBe(null);
+        expect(restoredNote).toBeGreaterThanOrEqual(before);
+        expect(restoredNote).toBeLessThanOrEqual(after);
     });
 });

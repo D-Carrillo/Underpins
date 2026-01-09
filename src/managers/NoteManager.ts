@@ -7,11 +7,17 @@ import {invoke} from "@tauri-apps/api/core";
 
 class ManagerForNotes{
     private readonly notes: BaseNote[] = [];
-    private deletedNotes: {note: BaseNote, date: Date}[]= [];
+    private deletedNotes: {note: BaseNote, date: number}[]= [];
 
     constructor() {
-        this.loadNotes().then(results => results.forEach(note => this.makeNotes(note)));
         makeAutoObservable(this);
+        this.loadNotes().then(results => results.forEach(note => this.makeNotes(note)));
+    }
+
+    public createNote(x: number, y: number, type: NoteTypes, content: string) {
+        const newNote = NoteFactory.makeNote(x, y, type, content);
+        this.AddANote(newNote);
+        return newNote;
     }
 
     private makeNotes(note: {type: string, create_at: number, content: string, id: string, position: {x: number, y: number}, size: {height: number, width:number}}) {
@@ -41,15 +47,9 @@ class ManagerForNotes{
             const deletedNote = this.notes.splice(deletingNoteIndex,1);
 
             if (deletedNote.length === 1) {
-                this.deletedNotes.push({note: deletedNote[0],  date: new Date()});
+                this.deletedNotes.push({note: deletedNote[0],  date:  Date.now()});
             }
         }
-    }
-
-    public createNote(x: number, y: number, type: NoteTypes, content: string) {
-        const newNote = NoteFactory.makeNote(x, y, type, content);
-        this.AddANote(newNote);
-        return newNote;
     }
 
     public async loadNotes() {
@@ -95,7 +95,7 @@ class ManagerForNotes{
         });
     }
 
-    public redoDeletedNote(): Date | null {
+    public redoDeletedNote(): number | null {
         const lastDeletedNote = this.deletedNotes.pop();
 
         if (lastDeletedNote) {
