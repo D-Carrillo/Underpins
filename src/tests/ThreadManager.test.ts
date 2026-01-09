@@ -4,6 +4,7 @@ import {NotesManager} from "../managers/NoteManager.ts";
 import {BaseNote} from "../notes/BaseNote.ts";
 import {any} from "./anyType.ts";
 import {TextNote} from "../notes/TextNote.ts";
+import {BaseThread} from "../threads/BaseThread.ts";
 
 function setupNotesSpy(mockData: BaseNote[]) {
     return vi.spyOn(Object.getPrototypeOf(NotesManager), 'loadNotes')
@@ -71,6 +72,21 @@ describe("ThreadManager Test Suite", () => {
             expect(ThreadManager.getThreadGraph().getAllThreadIDsThatConnectTo(targetID)).toStrictEqual([]);
             expect(ThreadManager.getDeletedThreads().some(t => t.threadType.getThreadID() === notes[0].id + '_' + targetID)).toBe(true);
             expect(ThreadManager.getDeletedThreads().some(t => t.threadType.getThreadID() === notes[2].id + '_' + targetID)).toBe(true);
+        });
+
+        test('restored thread function restores one thread', () => {
+            const dateNow = Date.now();
+
+            const originTarget = "origin_target";
+            ThreadManager.getDeletedThreads().push({threadType: new BaseThread(originTarget), date: dateNow});
+
+            ThreadManager.restoreDeletedThreads(dateNow);
+
+            const threadID = ThreadManager.getThreadGraph().returnVertexMap("origin")?.get("target")?.getThreadID();
+            const recentlyAddedContains  = ThreadManager.getRecentlyAddedThreads().includes(originTarget);
+
+            expect(threadID).toBe(originTarget);
+            expect(recentlyAddedContains).toBe(true);
         });
     });
 });

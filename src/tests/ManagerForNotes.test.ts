@@ -95,7 +95,6 @@ describe("NotesManager Test Suite", () => {
 
     test("Redo function returns null if the is no notes in the deleted note array", () => {
         const restoredNote = NotesManager.redoDeletedNote();
-
         expect(restoredNote).toBe(null);
     });
 });
