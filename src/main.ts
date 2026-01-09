@@ -1,9 +1,7 @@
 import { Application } from 'pixi.js';
-import {Board} from "./components/Board.ts";
-import {toolMenu} from "./MainMenus/toolMenu.ts";
-
-// import {showMenu} from "./MainMenus/showMenu.ts";
-// import {loadFonts, prepareBitmapFont} from "../fonts/loadFonts.ts";
+import {showMenu} from "./MainMenus/showMenu.ts";
+import {loadFonts, prepareBitmapFont} from "../fonts/loadFonts.ts";
+import { Viewport } from "pixi-viewport";
 
 const app = new Application();
 
@@ -17,18 +15,29 @@ async function init() {
     roundPixels: true,
   });
 
+  const viewport = new Viewport({
+    screenWidth: window.innerWidth,
+    screenHeight: window.innerHeight,
+    worldWidth: 1000,
+    worldHeight: 1000,
+    events: app.renderer.events,
+  })
+
+  app.stage.addChild(viewport);
+
+  viewport.drag().pinch().wheel().decelerate();
+
   document.body.appendChild(app.canvas);
 
-  // await loadFonts();
-  // await prepareBitmapFont();
-  // showMenu(app);
+  await loadFonts();
+  await prepareBitmapFont();
+  showMenu(app, viewport);
 
-  const myBoard = new Board(app);
-  app.ticker.add(() => {
-    myBoard.update();
-  });
-
-   new toolMenu(app);
+  // const myBoard = new Board(app);
+  // app.ticker.add(() => {
+  //   myBoard.update();
+  // });
+  //
 }
 
 init();

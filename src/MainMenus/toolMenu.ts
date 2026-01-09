@@ -1,7 +1,6 @@
 import {Application, Assets, Container, Graphics, Sprite} from "pixi.js";
 import {NotesManager} from "../managers/NoteManager.ts";
 import {ThreadManager} from "../managers/ThreadManager.ts";
-import {BoardManager} from "../managers/BoardManager.ts";
 
 const SIZE = 50;
 
@@ -34,7 +33,7 @@ export class toolMenu
 
         resizeObserver.observe(document.documentElement);
 
-        BoardManager.getStage()!.addChild(toolBar);
+        this.app.stage.addChild(toolBar);
     }
 
     private redoButton(toolBar: Container) {

@@ -18,8 +18,8 @@ export class Board {
     private noteMap = new Map<string, Container>();
     private threadMap = new Map<string, Container>();
 
-    constructor(app: Application) {
-        this.stage = app.stage;
+    constructor(app: Application, viewport: Container) {
+        this.stage = viewport;
         this.stage.eventMode = 'static';
         this.stage.hitArea = app.screen;
 

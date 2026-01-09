@@ -1,7 +1,8 @@
 import {Application, BitmapText, Container, Graphics, TextStyle} from "pixi.js";
 import {Board} from "../components/Board.ts";
+import {toolMenu} from "./toolMenu.ts";
 
-export function showMenu(app: Application) {
+export function showMenu(app: Application, viewport: Container) {
     const menuContainer = new Container();
     app.stage.addChild(menuContainer);
 
@@ -28,7 +29,7 @@ export function showMenu(app: Application) {
         event.stopPropagation();
         window.removeEventListener('resize', stayInMiddle);
         menuContainer.destroy({children: true});
-        startBoard(app);
+        startBoard(app, viewport);
     });
 
     const stayInMiddle = () => {
@@ -42,9 +43,11 @@ export function showMenu(app: Application) {
 
 }
 
-function startBoard(app: Application) {
-    const myBoard = new Board(app);
+function startBoard(app: Application, viewport: Container) {
+    const myBoard = new Board(app, viewport);
     app.ticker.add(() => {
         myBoard.update();
     });
+
+    new toolMenu(app);
 }
