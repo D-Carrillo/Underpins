@@ -1,6 +1,8 @@
 import {Application, Assets, Container, Graphics, Sprite} from "pixi.js";
 import {NotesManager} from "../managers/NoteManager.ts";
 import {ThreadManager} from "../managers/ThreadManager.ts";
+import {BoardManager} from "../managers/BoardManager.ts";
+import {Viewport} from "pixi-viewport";
 
 const SIZE = 50;
 
@@ -18,11 +20,12 @@ export class toolMenu
 
         this.saveButton(toolBar);
         this.redoButton(toolBar);
+        this.dragButton(toolBar);
 
-        toolBar.position.set(10, this.app.screen.height / 2 - 50);
+        toolBar.position.set(10, this.app.screen.height / 2  - 100);
 
         const stayInMiddle = () => {
-            toolBar.position.set(10, this.app.screen.height / 2 - 50);
+            toolBar.position.set(10, this.app.screen.height / 2 - 100);
         }
 
         const resizeObserver = new ResizeObserver(entries => {
@@ -39,7 +42,7 @@ export class toolMenu
     private redoButton(toolBar: Container) {
         const redoButton = new Container();
 
-        redoButton.position.set(0, 55);
+        redoButton.position.set(0, 110);
 
         this.toolSquare(redoButton);
         this.addIcon(redoButton, 'redoIcon.png').then();
@@ -81,6 +84,33 @@ export class toolMenu
         });
 
         toolBar.addChild(saveButton);
+    }
+
+    private dragButton(toolBar: Container) {
+        const dragButton = new Container();
+
+        dragButton.position.set(0, 55);
+
+        this.toolSquare(dragButton);
+        // this.addIcon(saveButton, 'saveIcon.png').then();
+
+        dragButton.eventMode = 'static';
+        dragButton.cursor = 'pointer';
+
+        dragButton.on('pointertap', () => {
+            const viewport = BoardManager.getViewport() as Viewport;
+            BoardManager.editingMode = !BoardManager.editingMode;
+
+            if (BoardManager.editingMode) {
+                viewport.plugins.resume('drag');
+                viewport.interactiveChildren = false;
+            } else {
+                viewport.plugins.pause('drag');
+                viewport.interactiveChildren = true;
+            }
+        });
+
+        toolBar.addChild(dragButton);
     }
 
     private toolSquare(button: Container) {

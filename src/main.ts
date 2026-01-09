@@ -26,6 +26,7 @@ async function init() {
   app.stage.addChild(viewport);
 
   viewport.drag().pinch().wheel().decelerate();
+  viewport.plugins.pause('drag');
 
   document.body.appendChild(app.canvas);
 

@@ -9,7 +9,7 @@ export class HandThread {
     private static activeHandler: ((event: any) => void) | null = null;
 
     public static linkToHand(event: MouseEvent, noteID: string) {
-        const stage = BoardManager.getStage();
+        const stage = BoardManager.getViewport();
 
         if (stage === null) {
             throw Error("The BoardManager does not have required stage");
@@ -50,7 +50,7 @@ export class HandThread {
     }
 
     private static stopMouseMove(mouseCircle: Graphics) {
-        const stage = BoardManager.getStage();
+        const stage = BoardManager.getViewport();
 
         if(stage && this.activeHandler) {
             stage.off("globalmousemove", this.activeHandler);

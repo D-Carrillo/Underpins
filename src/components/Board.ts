@@ -1,4 +1,4 @@
-import {Application, Container, ContainerChild} from "pixi.js";
+import {Application, Container, ContainerChild, Ticker} from "pixi.js";
 import {TextNoteComponent} from "./TextNoteComponent.ts";
 import {NotesManager} from "../managers/NoteManager.ts";
 import {observe, reaction} from "mobx";
@@ -14,19 +14,21 @@ import {ImageNoteComponent} from "./ImageNoteComponent.ts";
 import {ImageNote} from "../notes/ImageNote.ts";
 
 export class Board {
-    private readonly stage: Container<ContainerChild>
+    private readonly viewport: Container<ContainerChild>
     private noteMap = new Map<string, Container>();
     private threadMap = new Map<string, Container>();
+    private boardTicker = new Ticker();
 
     constructor(app: Application, viewport: Container) {
-        this.stage = viewport;
-        this.stage.eventMode = 'static';
-        this.stage.hitArea = app.screen;
+        this.viewport = viewport;
+        this.viewport.eventMode = 'static';
+        this.viewport.hitArea = app.screen;
 
         app.canvas.addEventListener('contextmenu', (e) => e.preventDefault());
 
         BoardManager.setNoteMap(() => this.noteMap);
-        BoardManager.setStage(this.stage);
+        BoardManager.setViewport(this.viewport);
+        BoardManager.setBoardTicker(this.boardTicker);
 
         // Put a loading image to make sure the threads are not seen all over the place, but only when the board has fully loaded.
         this.loadMenu();
@@ -73,7 +75,7 @@ export class Board {
                 const visualThread = this.threadMap.get(threadID);
 
                 if (visualThread) {
-                    ThreadManager.destroyVisualThread(visualThread, this.stage);
+                    ThreadManager.destroyVisualThread(visualThread, this.viewport);
                     this.threadMap.delete(threadID)
                 }
             });
@@ -92,9 +94,9 @@ export class Board {
 
         // Need to make a factory for the components - One
         if (note instanceof TextNote) {
-            singularNoteContainer = new TextNoteComponent(note, this.stage).makeNote();
+            singularNoteContainer = new TextNoteComponent(note, this.viewport, this.boardTicker).makeNote();
         } else if (note instanceof ImageNote){
-            singularNoteContainer = new ImageNoteComponent(note, this.stage).makeNote();
+            singularNoteContainer = new ImageNoteComponent(note, this.viewport, this.boardTicker).makeNote();
         }
         else {
             throw Error("Instance was not of any know type of note");
@@ -104,13 +106,13 @@ export class Board {
     }
 
     private makeThreadVisual(originID: string, destinationID: string, threadType: BaseThread) {
-        const singularThreadContainer = new ThreadComponent(this.noteMap.get(originID)!, this.noteMap.get(destinationID)!, threadType).makeThreadWithPins(this.stage)
+        const singularThreadContainer = new ThreadComponent(this.noteMap.get(originID)!, this.noteMap.get(destinationID)!, threadType).makeThreadWithPins(this.viewport)
         this.threadMap.set(threadType.getThreadID(), singularThreadContainer);
     }
 
     private loadMenu() {
-        this.stage.on('rightclick', (event) => {
-            if (event.target === this.stage) {
+        this.viewport.on('rightclick', (event) => {
+            if (event.target === this.viewport) {
                 useContextMenu(event.nativeEvent as MouseEvent, BoardMenu, "note");
             }
         })

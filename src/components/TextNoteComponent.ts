@@ -3,7 +3,7 @@ import {
     ContainerChild,
     FederatedPointerEvent,
     Text,
-    TextStyle
+    TextStyle,
 } from "pixi.js";
 import {TextNote as TextN} from "../notes/TextNote.ts";
 import {TextEditor} from "./TextEditor.ts";
@@ -17,7 +17,7 @@ export class TextNoteComponent extends BaseNoteComponent{
     private readonly text: Text;
 
     constructor(concrete_note: TextN, stage: Container<ContainerChild>) {
-        super(concrete_note, stage)
+        super(concrete_note, stage);
         this.text = this.makeTheTextGraphic();
     }
 
@@ -63,7 +63,7 @@ export class TextNoteComponent extends BaseNoteComponent{
     private closeEditor() {
         if (this.editing !== null) {
             setTimeout(() => {
-                BoardManager.getStage()!.off('pointerdown', this.closeOnBlur);
+                BoardManager.getViewport()!.off('pointerdown', this.closeOnBlur);
             }, 0);
             this.editing.close();
             this.editing = null;
@@ -99,7 +99,7 @@ export class TextNoteComponent extends BaseNoteComponent{
         this.editing = new TextEditor(text, this.note as TextN);
         this.editing.open();
 
-        BoardManager.getStage()!.on('pointerdown', this.closeOnBlur);
+        BoardManager.getViewport()!.on('pointerdown', this.closeOnBlur);
     }
 
     private closeOnBlur = (event: FederatedPointerEvent) => {
@@ -112,7 +112,7 @@ export class TextNoteComponent extends BaseNoteComponent{
                 }
             }
         } else {
-            BoardManager.getStage()!.off('pointerdown', this.closeOnBlur);
+            BoardManager.getViewport()!.off('pointerdown', this.closeOnBlur);
             this.NoteGroup.destroy({children: true});
         }
     }
