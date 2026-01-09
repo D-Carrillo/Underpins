@@ -5,8 +5,7 @@ import {
     Graphics,
     Sprite,
     Assets,
-    Point,
-    Bounds,
+    Point
 } from "pixi.js";
 import {BaseThread} from "../threads/BaseThread.ts";
 import {useContextMenu} from "../menus/BaseMenu.ts";
@@ -31,9 +30,9 @@ export class ThreadComponent {
     public makeThreadWithPins(stage: Container<ContainerChild> ): Container<ContainerChild> {
         const container = new Container();
 
-        const line = this.makeLineVisual(container);
+        this.makeLineVisual(container);
 
-        this.makeThePins(container, line);
+        this.makeThePins(container);
 
         stage.addChild(container);
 
@@ -63,18 +62,18 @@ export class ThreadComponent {
         return line;
     }
 
-    private makeThePins(container: Container<ContainerChild>, line: Graphics) {
+    private makeThePins(container: Container<ContainerChild>) {
 
-        const bounds = this.getTheLocalPosition(line);
+        const bounds = this.getTheLocalPosition();
         const threadOriginPos  = this.calculateDisplayCoordinates(bounds.start, bounds.startBounds);
         const threadEndPos = this.calculateDisplayCoordinates(bounds.end, bounds.endBounds);
 
-        this.makeThePinSprite(container, threadOriginPos, "origin", line);
-        this.makeThePinSprite(container, threadEndPos, "end", line);
+        this.makeThePinSprite(container, threadOriginPos, "origin");
+        this.makeThePinSprite(container, threadEndPos, "end");
 
     }
 
-    private async makeThePinSprite(container: Container<ContainerChild>, pinPos: {x: number, y: number}, place: string, line: Graphics) {
+    private async makeThePinSprite(container: Container<ContainerChild>, pinPos: {x: number, y: number}, place: string) {
         try {
             const texture = await Assets.load('/pin.png');
             const pinSprite = new Sprite(texture);
@@ -92,7 +91,7 @@ export class ThreadComponent {
                     Ticker.shared.remove(updateCallback);
                     return;
                 }
-                this.updateThreads(pinSprite, place, line);
+                this.updateThreads(pinSprite, place);
             };
 
             Ticker.shared.add(updateCallback);
@@ -104,27 +103,27 @@ export class ThreadComponent {
 
     private drawLine(line: Graphics) {
 
-        const bounds = this.getTheLocalPosition(line);
+        const bounds = this.getTheLocalPosition();
         const threadOriginPos  = this.calculateDisplayCoordinates(bounds.start, bounds.startBounds);
         const threadEndPos  = this.calculateDisplayCoordinates(bounds.end, bounds.endBounds);
 
         line.moveTo(threadOriginPos.x, threadOriginPos.y ).lineTo(threadEndPos.x , threadEndPos.y).stroke({width: 2, color: this.threadType.getColor()});
     }
 
-    private getTheLocalPosition(line: Graphics): {start: Point, end: Point, startBounds: Bounds, endBounds: Bounds} {
-        const parent = line.parent!;
+    private getTheLocalPosition(): {start: Point, end: Point, startBounds: {width: number, height: number}, endBounds: {width: number, height: number}} {
+        const start = new Point(this.fromNote.x, this.fromNote.y);
+        const end = new Point(this.toNote.x, this.toNote.y);
 
-        const startBounds = this.fromNote.getBounds();
-        const endBounds = this.toNote.getBounds();
-
-        const start = parent.toLocal(startBounds);
-        const end = parent.toLocal(endBounds);
-
-        return {start: start, end: end, startBounds: startBounds, endBounds: endBounds};
+        return {
+            start,
+            end,
+            startBounds: { width: this.fromNote.width, height: this.fromNote.height },
+            endBounds: { width: this.toNote.width, height: this.toNote.height }
+        };
     }
 
-    private calculateDisplayCoordinates(positon: Point, bounds: Bounds): {x: number, y: number} {
-        return {x: positon.x + bounds.width / 2, y: bounds.y + 10};
+    private calculateDisplayCoordinates(positon: Point, bounds: {width: number, height: number}): {x: number, y: number} {
+        return {x: positon.x + bounds.width / 2, y: positon.y + 10};
     }
 
     private updateLine(line: Graphics) {
@@ -133,14 +132,14 @@ export class ThreadComponent {
             line.clear();
             this.drawLine(line)
 
-            this.toNotePos = {x: this.toNote.getBounds().x, y: this.toNote.getBounds().y};
-            this.fromNotePos =  {x: this.fromNote.getBounds().x, y: this.fromNote.getBounds().y};
+            this.toNotePos = {x: this.toNote.position.x, y: this.toNote.position.y};
+            this.fromNotePos =  {x: this.fromNote.position.x, y: this.fromNote.position.y};
         }
     }
 
-    private updateThreads(pinSprite: Sprite, place: string, line: Graphics) {
+    private updateThreads(pinSprite: Sprite, place: string) {
         if (this.framesSinceMoved > 0) {
-            const bounds = this.getTheLocalPosition(line);
+            const bounds = this.getTheLocalPosition();
             let targetPos: { x: number, y: number };
 
             if (place === "origin") {
@@ -157,8 +156,8 @@ export class ThreadComponent {
     }
 
     private notesMoved(): boolean {
-        const start = this.fromNote.getBounds();
-        const end = this.toNote.getBounds();
+        const start = this.fromNote.position;
+        const end = this.toNote.position;
 
         const EPS = 0.01;
 
