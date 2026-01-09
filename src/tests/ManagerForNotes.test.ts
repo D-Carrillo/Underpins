@@ -12,6 +12,7 @@ function setupLoadNotesSpy(mockData: BaseNote[]) {
 
 function resetManagerNotes(notes: BaseNote[]) {
     (NotesManager as any).notes = notes;
+    (NotesManager as any).deletedNotes = [];
 }
 
 describe("NotesManager Test Suite", () => {
@@ -79,6 +80,11 @@ describe("NotesManager Test Suite", () => {
         expect(notes).toEqual(mockNotes);
     });
 
+    test("Redo function returns null if the is no notes in the deleted note array", () => {
+        const restoredNote = NotesManager.redoDeletedNote();
+        expect(restoredNote).toBe(null);
+    });
+
     test("The Redo function returns the last deleted note", () => {
         const newNoteToDelete = NotesManager.createNote(any<number>(),  any<number>(), NoteTypes.TEXT,  any<string>());
 
@@ -91,10 +97,5 @@ describe("NotesManager Test Suite", () => {
         expect(restoredNote).not.toBe(null);
         expect(restoredNote).toBeGreaterThanOrEqual(before);
         expect(restoredNote).toBeLessThanOrEqual(after);
-    });
-
-    test("Redo function returns null if the is no notes in the deleted note array", () => {
-        const restoredNote = NotesManager.redoDeletedNote();
-        expect(restoredNote).toBe(null);
     });
 });

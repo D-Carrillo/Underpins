@@ -88,5 +88,27 @@ describe("ThreadManager Test Suite", () => {
             expect(threadID).toBe(originTarget);
             expect(recentlyAddedContains).toBe(true);
         });
+
+        test('restored thread function restores multiple threads', () => {
+            const dateNow = Date.now();
+
+            const originTarget = "origin_target";
+            const originTarget2 = "origin_target2";
+
+            ThreadManager.getDeletedThreads().push({threadType: new BaseThread(originTarget), date: dateNow});
+            ThreadManager.getDeletedThreads().push({threadType: new BaseThread(originTarget2), date: dateNow});
+
+            ThreadManager.restoreDeletedThreads(dateNow);
+
+            const threadIDTarget = ThreadManager.getThreadGraph().returnVertexMap("origin")?.get("target")?.getThreadID();
+            const threadIDTarget2 = ThreadManager.getThreadGraph().returnVertexMap("origin")?.get("target2")?.getThreadID();
+            const recentlyAddedContainsTarget  = ThreadManager.getRecentlyAddedThreads().includes(originTarget);
+            const recentlyAddedContainsTarget2  = ThreadManager.getRecentlyAddedThreads().includes(originTarget);
+
+            expect(threadIDTarget).toBe(originTarget);
+            expect(threadIDTarget2).toBe(originTarget2);
+            expect(recentlyAddedContainsTarget).toBe(true);
+            expect(recentlyAddedContainsTarget2).toBe(true);
+        });
     });
 });
