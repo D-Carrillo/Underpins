@@ -18,15 +18,15 @@ export class HandThread {
         NotesManager.notesLightUpForSelection(BoardManager.getNoteMap(), noteID);
 
         this.activeHandler = (event: FederatedPointerEvent) => {
-            mouseCircle.x = event.global.x;
-            mouseCircle.y = event.global.y;
+            const position =  BoardManager.getViewport()?.toLocal(event.global);
+            mouseCircle.position.set(position!.x, position!.y);
         }
 
-        const mouseCircle = new Graphics().circle(0, 0, 10).fill(0x000000);
+        const mouseCircle = new Graphics().roundRect(0, 0, 25, 25, 50).fill(0x000000);
         stage.addChild(mouseCircle);
 
-        mouseCircle.x = event.x;
-        mouseCircle.y = event.y;
+        const position =  BoardManager.getViewport()?.toLocal(event);
+        mouseCircle.position.set(position!.x, position!.y);
 
         const unlinkedThread = new ThreadComponent(BoardManager.getNote(noteID)!, mouseCircle, new BaseThread(noteID + "_Fake")).makeThreadWithPins(stage);
 

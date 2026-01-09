@@ -88,11 +88,17 @@ export class toolMenu
 
     private dragButton(toolBar: Container) {
         const dragButton = new Container();
+        let cursor: Sprite;
+        let cursorWithNote: Sprite;
 
         dragButton.position.set(0, 55);
 
         this.toolSquare(dragButton);
-        // this.addIcon(saveButton, 'saveIcon.png').then();
+        this.addIcon(dragButton, 'cursor.png').then(sprite => {
+            cursor = sprite;
+            cursor.visible = false;
+        });
+        this.addIcon(dragButton, "cursorWithNote.png").then(sprite => cursorWithNote = sprite);
 
         dragButton.eventMode = 'static';
         dragButton.cursor = 'pointer';
@@ -104,9 +110,13 @@ export class toolMenu
             if (BoardManager.editingMode) {
                 viewport.plugins.resume('drag');
                 viewport.interactiveChildren = false;
+                cursor.visible = true;
+                cursorWithNote.visible = false;
             } else {
                 viewport.plugins.pause('drag');
                 viewport.interactiveChildren = true;
+                cursorWithNote.visible = true;
+                cursor.visible = false;
             }
         });
 
@@ -121,16 +131,17 @@ export class toolMenu
         button.addChild(rect);
     }
 
-    private async addIcon(rect: Container, iconPath: String) {
+    private async addIcon(rect: Container, iconPath: String): Promise<Sprite> {
         const texture = await Assets.load(iconPath);
-        const saveIcon = new Sprite(texture);
+        const icon = new Sprite(texture);
 
-        saveIcon.roundPixels = true;
+        icon.roundPixels = true;
 
-        saveIcon.anchor.set(0.5);
-        saveIcon.scale.set(0.02);
-        saveIcon.position.set(SIZE / 2, SIZE / 2);
+        icon.anchor.set(0.5);
+        icon.scale.set(0.02);
+        icon.position.set(SIZE / 2, SIZE / 2);
 
-        rect.addChild(saveIcon);
+        rect.addChild(icon);
+        return icon;
     }
 }

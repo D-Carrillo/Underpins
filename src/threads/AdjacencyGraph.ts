@@ -14,6 +14,8 @@ export class AdjacencyGraph {
     }
 
     public addEdge(vertexID:string, destinationVertexID: string, baseThread?: BaseThread){
+        if (vertexID === destinationVertexID) {return;}
+
         if (!this.adjacentList.has(vertexID)) {
             this.addVertex(vertexID);
         }

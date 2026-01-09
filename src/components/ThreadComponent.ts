@@ -22,7 +22,7 @@ export class ThreadComponent {
     constructor(fromNote: Container<ContainerChild>, toNote: Container<ContainerChild>, threadType: BaseThread) {
         this.fromNote = fromNote;
         this.toNote = toNote;
-        this.toNotePos = {x:toNote.getBounds().x, y: toNote.getBounds().y};
+        this.toNotePos = {x:toNote.getBounds().x , y: toNote.getBounds().y};
         this.fromNotePos = {x:fromNote.getBounds().x, y: fromNote.getBounds().y};
         this.threadType = threadType;
     }
