@@ -7,7 +7,7 @@ const MIN_DISTANCE = 5;
 export abstract class BaseNoteComponent {
     protected readonly note: BaseNote
     protected NoteGroup: Container;
-    protected Stage: Container<ContainerChild>;
+    protected viewport: Container<ContainerChild>;
     protected dragTarget: Graphics | null = null;
     protected offset = {x: 0, y: 0};
 
@@ -19,7 +19,7 @@ export abstract class BaseNoteComponent {
     protected constructor(note: BaseNote, stage: Container<ContainerChild>) {
         this.note = note;
         this.NoteGroup = new Container();
-        this.Stage = stage;
+        this.viewport = stage;
     }
 
     protected makeNoteBaseGraphics(Menu: MenuCreator) {
@@ -40,7 +40,7 @@ export abstract class BaseNoteComponent {
         this.makeDraggable();
         this.makeEditable(Menu);
 
-        this.Stage.addChildAt(this.NoteGroup, 0);
+        this.viewport.addChildAt(this.NoteGroup, 0);
     }
 
     protected onDragStartHelper(event: FederatedPointerEvent) {
@@ -52,12 +52,12 @@ export abstract class BaseNoteComponent {
         this.offset.x = this.NoteGroup.x - localPos.x;
         this.offset.y = this.NoteGroup.y - localPos.y;
 
-        this.Stage.on('pointermove', this.onDragMove);
+        this.viewport.on('pointermove', this.onDragMove);
     }
 
     private onDragMove=  (event: FederatedPointerEvent) => {
         if (this.dragTarget) {
-            const localPos = this.dragTarget.parent!.toLocal(event.global);
+            const localPos = this.viewport.toLocal(event.global);
             this.dragTarget.x = localPos.x + this.offset.x;
             this.dragTarget.y = localPos.y + this.offset.y;
         }
@@ -69,8 +69,8 @@ export abstract class BaseNoteComponent {
 
             this.note.changeCoordinate(this.NoteGroup.x, this.NoteGroup.y);
 
-            if( this.Stage ) {
-                this.Stage.off('pointermove', this.onDragMove);
+            if( this.viewport ) {
+                this.viewport.off('pointermove', this.onDragMove);
             }
 
             this.dragTarget.alpha = 1;
