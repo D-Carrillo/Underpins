@@ -1,16 +1,9 @@
-import {Container, Ticker} from "pixi.js";
+import {Container} from "pixi.js";
 
 class ManagerForBoards {
     private noteMap: (() => Map<string, Container>)  | null = null;
     private viewport: Container | null = null;
-    public editingMode = false;
-    private boardTicker : Ticker | null = null;
-
-    public setBoardTicker(ticker: Ticker){
-        this.boardTicker = ticker;
-    }
-
-    public getTicker = (): Ticker | null => this.boardTicker;
+    public draggingMode = false;
 
     public setNoteMap(map: (() => Map<string, Container>)) {
         this.noteMap = map;

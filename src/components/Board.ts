@@ -1,4 +1,4 @@
-import {Application, Container, ContainerChild, Ticker} from "pixi.js";
+import {Application, Container, ContainerChild} from "pixi.js";
 import {TextNoteComponent} from "./TextNoteComponent.ts";
 import {NotesManager} from "../managers/NoteManager.ts";
 import {observe, reaction} from "mobx";
@@ -17,7 +17,6 @@ export class Board {
     private readonly viewport: Container<ContainerChild>
     private noteMap = new Map<string, Container>();
     private threadMap = new Map<string, Container>();
-    private boardTicker = new Ticker();
 
     constructor(app: Application, viewport: Container) {
         this.viewport = viewport;
@@ -28,7 +27,6 @@ export class Board {
 
         BoardManager.setNoteMap(() => this.noteMap);
         BoardManager.setViewport(this.viewport);
-        BoardManager.setBoardTicker(this.boardTicker);
 
         // Put a loading image to make sure the threads are not seen all over the place, but only when the board has fully loaded.
         this.loadMenu();
@@ -94,9 +92,9 @@ export class Board {
 
         // Need to make a factory for the components - One
         if (note instanceof TextNote) {
-            singularNoteContainer = new TextNoteComponent(note, this.viewport, this.boardTicker).makeNote();
+            singularNoteContainer = new TextNoteComponent(note, this.viewport).makeNote();
         } else if (note instanceof ImageNote){
-            singularNoteContainer = new ImageNoteComponent(note, this.viewport, this.boardTicker).makeNote();
+            singularNoteContainer = new ImageNoteComponent(note, this.viewport).makeNote();
         }
         else {
             throw Error("Instance was not of any know type of note");
@@ -112,7 +110,7 @@ export class Board {
 
     private loadMenu() {
         this.viewport.on('rightclick', (event) => {
-            if (event.target === this.viewport) {
+            if (event.target === this.viewport && !BoardManager.draggingMode) {
                 useContextMenu(event.nativeEvent as MouseEvent, BoardMenu, "note");
             }
         })

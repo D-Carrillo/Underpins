@@ -25,7 +25,12 @@ async function init() {
 
   app.stage.addChild(viewport);
 
-  viewport.drag().pinch().wheel().decelerate();
+  viewport.drag().pinch().wheel().decelerate().clampZoom({
+    minWidth: 50,
+    maxWidth: 4000,
+    minHeight: 50,
+    maxHeight: 4000
+  });
   viewport.plugins.pause('drag');
 
   document.body.appendChild(app.canvas);

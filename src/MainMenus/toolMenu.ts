@@ -105,9 +105,9 @@ export class toolMenu
 
         dragButton.on('pointertap', () => {
             const viewport = BoardManager.getViewport() as Viewport;
-            BoardManager.editingMode = !BoardManager.editingMode;
+            BoardManager.draggingMode = !BoardManager.draggingMode;
 
-            if (BoardManager.editingMode) {
+            if (BoardManager.draggingMode) {
                 viewport.plugins.resume('drag');
                 viewport.interactiveChildren = false;
                 cursor.visible = true;
