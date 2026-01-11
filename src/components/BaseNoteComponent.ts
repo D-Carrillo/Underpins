@@ -65,6 +65,8 @@ export abstract class BaseNoteComponent {
             const localPos = this.viewport.toLocal(event.global);
             this.dragTarget.x = localPos.x + this.offset.x;
             this.dragTarget.y = localPos.y + this.offset.y;
+
+            this.NoteGroup.zIndex = this.viewport.children.length;
         }
     }
 
@@ -81,6 +83,8 @@ export abstract class BaseNoteComponent {
             this.dragTarget.alpha = 1;
             this.dragTarget.getChildAt(0).alpha = 1;
             this.dragTarget = null;
+
+            this.NoteGroup.zIndex = this.viewport.children.length - 1;
 
             return distance < MIN_DISTANCE;
         }

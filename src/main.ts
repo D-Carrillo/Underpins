@@ -30,7 +30,8 @@ async function init() {
     maxWidth: 4000,
     minHeight: 50,
     maxHeight: 4000
-  });
+  }).sortableChildren = true;
+
   viewport.plugins.pause('drag');
 
   document.body.appendChild(app.canvas);
