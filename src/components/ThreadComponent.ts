@@ -96,8 +96,8 @@ export class ThreadComponent {
 
             Ticker.shared.add(updateCallback);
 
-        } catch (e) {
-            console.error("Pin failed to load", e);
+        } catch (error) {
+            console.error("Pin failed to load", error);
         }
     }
 
