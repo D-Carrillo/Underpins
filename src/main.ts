@@ -18,19 +18,14 @@ async function init() {
   const viewport = new Viewport({
     screenWidth: window.innerWidth,
     screenHeight: window.innerHeight,
-    worldWidth: 1000,
-    worldHeight: 1000,
+    worldWidth: window.innerWidth,
+    worldHeight: window.innerHeight,
     events: app.renderer.events,
   })
 
   app.stage.addChild(viewport);
 
-  viewport.drag().pinch().wheel().decelerate().clampZoom({
-    minWidth: 50,
-    maxWidth: 4000,
-    minHeight: 50,
-    maxHeight: 4000
-  }).sortableChildren = true;
+  viewport.drag().pinch().wheel().decelerate().sortableChildren = true;
 
   viewport.plugins.pause('drag');
 

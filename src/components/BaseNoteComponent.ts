@@ -16,15 +16,17 @@ export abstract class BaseNoteComponent {
     protected abstract onDragStart(event: FederatedPointerEvent): void;
     protected abstract onDragEnd(): void;
 
-    protected constructor(note: BaseNote, stage: Container<ContainerChild>) {
+    protected constructor(note: BaseNote, viewport: Container<ContainerChild>) {
         this.note = note;
         this.NoteGroup = new Container();
-        this.viewport = stage;
+        this.viewport = viewport;
+
+        this.setZAxisPosition();
     }
 
     protected makeNoteBaseGraphics(Menu: MenuCreator) {
         this.makeRectangle(Menu);
-        this.addPin();
+        this.addPin().then();
     }
 
     private makeRectangle(Menu: (e: MouseEvent, m: HTMLDivElement, t: string) => void) {
@@ -66,7 +68,8 @@ export abstract class BaseNoteComponent {
             this.dragTarget.x = localPos.x + this.offset.x;
             this.dragTarget.y = localPos.y + this.offset.y;
 
-            this.NoteGroup.zIndex = this.viewport.children.length;
+            this.note.moveZAxis(this.viewport.children.length);
+            this.NoteGroup.zIndex = this.note.getZAxisPosition();
         }
     }
 
@@ -84,7 +87,8 @@ export abstract class BaseNoteComponent {
             this.dragTarget.getChildAt(0).alpha = 1;
             this.dragTarget = null;
 
-            this.NoteGroup.zIndex = this.viewport.children.length - 1;
+            this.note.moveZAxis(this.viewport.children.length - 1);
+            this.NoteGroup.zIndex = this.note.getZAxisPosition();
 
             return distance < MIN_DISTANCE;
         }
@@ -123,6 +127,14 @@ export abstract class BaseNoteComponent {
 
         } catch (error) {
             console.error("Pin failed to load", error);
+        }
+    }
+
+    private setZAxisPosition() {
+        if (this.note.ZAxisIsSet()) {
+            this.note.moveZAxis(this.NoteGroup.zIndex);
+        } else {
+            this.NoteGroup.zIndex = this.note.getZAxisPosition();
         }
     }
 }

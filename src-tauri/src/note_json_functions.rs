@@ -21,7 +21,8 @@ pub enum Notes {
         content: String,
         id: String,
         position: Coordinates,
-        sizes: Size
+        sizes: Size,
+        z_position: u32
     },
 
     #[serde(rename = "TextNote")]
@@ -30,7 +31,8 @@ pub enum Notes {
         content: String,
         id: String,
         position: Coordinates,
-        sizes: Size
+        sizes: Size,
+        z_position: u32
     }
 }
 

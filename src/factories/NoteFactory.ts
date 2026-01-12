@@ -17,13 +17,17 @@ class NoteFactory {
     }
 
     // This would be removed once the factory is fully finish and once the Enum is passed into the JSON
-    public static loadNote(type: string, x: number, y: number, content: string, id: string, createAt: number ): BaseNote {
+    public static loadNote(type: string, x: number, y: number, content: string, id: string, createAt: number, z_position: number): BaseNote {
         if ( type === "TextNote") {
-            return new TextNote(content, x, y, id, createAt);
+            const note = new TextNote(content, x, y, id, createAt);
+            note.moveZAxis(z_position);
+            return note
         }
 
         else if ( type === "ImageNote" ) {
-            return new ImageNote(content, x, y, id, createAt);
+            const note = new ImageNote(content, x, y, id, createAt);
+            note.moveZAxis(z_position);
+            return note
         }
 
         throw new Error("Not implemented");

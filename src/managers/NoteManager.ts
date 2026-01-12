@@ -20,8 +20,8 @@ class ManagerForNotes{
         return newNote;
     }
 
-    private makeNotes(note: {type: string, create_at: number, content: string, id: string, position: {x: number, y: number}, size: {height: number, width:number}}) {
-        const loadedNote = NoteFactory.loadNote(note.type, note.position.x, note.position.y, note.content, note.id, note.create_at);
+    private makeNotes(note: {type: string, create_at: number, content: string, id: string, position: {x: number, y: number}, size: {height: number, width:number}, z_position: number}) {
+        const loadedNote = NoteFactory.loadNote(note.type, note.position.x, note.position.y, note.content, note.id, note.create_at, note.z_position);
         this.notes.push(loadedNote);
     }
 
@@ -60,7 +60,8 @@ class ManagerForNotes{
                 content: string,
                 id: string,
                 position: { x: number, y: number },
-                size: { height: number, width: number }
+                size: { height: number, width: number },
+                z_position: number
             }[]>('load_notes_from_json');
         } catch (error) {
             console.error("Failed to load notes: ", error);
@@ -99,7 +100,7 @@ class ManagerForNotes{
         const lastDeletedNote = this.deletedNotes.pop();
 
         if (lastDeletedNote) {
-            this.makeNotes({type: lastDeletedNote.note.type, create_at: lastDeletedNote.note.create_at, content: lastDeletedNote.note.content, id: lastDeletedNote.note.id, position: lastDeletedNote.note.position, size: lastDeletedNote.note.sizes});
+            this.makeNotes({type: lastDeletedNote.note.type, create_at: lastDeletedNote.note.create_at, content: lastDeletedNote.note.content, id: lastDeletedNote.note.id, position: lastDeletedNote.note.position, size: lastDeletedNote.note.sizes, z_position: lastDeletedNote.note.getZAxisPosition()});
         }
 
         return lastDeletedNote?.date || null;

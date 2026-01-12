@@ -16,6 +16,7 @@ export abstract class BaseNote
     position: coordinates;
     sizes: size;
     type: string;
+    private z_position: number = -1;
 
     protected constructor(type: string, content: string, x_coordinate: number, y_coordinate: number, height: number, width: number);
     protected constructor(type: string, content: string, x_coordinate: number, y_coordinate: number, height: number, width: number, id: string, createdAt: number);
@@ -28,11 +29,20 @@ export abstract class BaseNote
         this.sizes = {height: height, width: width};
     }
 
-
-    changeCoordinate(x_coordinate:number, y_coordinate:number): void {
+    public changeCoordinate(x_coordinate:number, y_coordinate:number): void {
         this.position.x = x_coordinate;
         this.position.y = y_coordinate;
     }
 
+    public moveZAxis(pos: number) {
+        this.z_position = pos;
+    }
+
+    public getZAxisPosition = (): number => this.z_position;
+
     abstract updateContent: (newContent: string) => void;
+
+    public ZAxisIsSet() {
+        return this.z_position === -1;
+    }
 }
