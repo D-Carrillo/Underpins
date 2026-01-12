@@ -25,11 +25,27 @@ async function init() {
 
   app.stage.addChild(viewport);
 
-  viewport.drag().pinch().wheel().decelerate().sortableChildren = true;
+  viewport.drag().pinch().wheel().decelerate().clampZoom({
+    minWidth: Math.floor(window.innerWidth / 2),
+    minHeight: Math.floor(window.innerHeight / 2),
+    maxWidth: Math.floor(window.innerWidth * 2.5),
+    maxHeight: Math.floor(window.innerHeight * 2.5),
+  }).sortableChildren = true;
 
   viewport.plugins.pause('drag');
 
   document.body.appendChild(app.canvas);
+  document.addEventListener('resize', () => {
+    viewport.worldWidth = window.innerWidth;
+    viewport.worldHeight = window.innerHeight;
+
+    viewport.clampZoom({
+      minWidth: Math.floor(window.innerWidth / 2),
+      minHeight: Math.floor(window.innerHeight / 2),
+      maxWidth: Math.floor(window.innerWidth * 2.5),
+      maxHeight: Math.floor(window.innerHeight * 2.5),
+    });
+  });
 
   await loadFonts();
   await prepareBitmapFont();
