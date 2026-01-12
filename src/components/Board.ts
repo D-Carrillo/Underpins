@@ -104,7 +104,7 @@ export class Board {
     }
 
     private makeThreadVisual(originID: string, destinationID: string, threadType: BaseThread) {
-        const singularThreadContainer = new ThreadComponent(this.noteMap.get(originID)!, this.noteMap.get(destinationID)!, threadType).makeThreadWithPins(this.viewport)
+        const singularThreadContainer = new ThreadComponent(this.noteMap.get(originID)!, this.noteMap.get(destinationID)!, threadType, this.viewport).makeThreadWithPins()
         this.threadMap.set(threadType.getThreadID(), singularThreadContainer);
     }
 

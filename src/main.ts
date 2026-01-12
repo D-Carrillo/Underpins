@@ -35,7 +35,8 @@ async function init() {
   viewport.plugins.pause('drag');
 
   document.body.appendChild(app.canvas);
-  document.addEventListener('resize', () => {
+
+  window.addEventListener('resize', () => {
     viewport.worldWidth = window.innerWidth;
     viewport.worldHeight = window.innerHeight;
 
@@ -45,17 +46,13 @@ async function init() {
       maxWidth: Math.floor(window.innerWidth * 2.5),
       maxHeight: Math.floor(window.innerHeight * 2.5),
     });
+
+    console.log("I got run");
   });
 
   await loadFonts();
   await prepareBitmapFont();
   showMenu(app, viewport);
-
-  // const myBoard = new Board(app);
-  // app.ticker.add(() => {
-  //   myBoard.update();
-  // });
-  //
 }
 
 init();

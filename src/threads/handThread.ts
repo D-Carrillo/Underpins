@@ -9,9 +9,9 @@ export class HandThread {
     private static activeHandler: ((event: any) => void) | null = null;
 
     public static linkToHand(event: MouseEvent, noteID: string) {
-        const stage = BoardManager.getViewport();
+        const viewport = BoardManager.getViewport();
 
-        if (stage === null) {
+        if (viewport === null) {
             throw Error("The BoardManager does not have required stage");
         }
 
@@ -23,18 +23,18 @@ export class HandThread {
         }
 
         const mouseCircle = new Graphics().roundRect(0, 0, 25, 25, 50).fill(0x000000);
-        stage.addChild(mouseCircle);
+        viewport.addChild(mouseCircle);
 
         const position =  BoardManager.getViewport()?.toLocal(event);
         mouseCircle.position.set(position!.x, position!.y);
 
-        const unlinkedThread = new ThreadComponent(BoardManager.getNote(noteID)!, mouseCircle, new BaseThread(noteID + "_Fake")).makeThreadWithPins(stage);
+        const unlinkedThread = new ThreadComponent(BoardManager.getNote(noteID)!, mouseCircle, new BaseThread(noteID + "_Fake"), viewport).makeThreadWithPins();
 
-        stage.on('globalmousemove', this.activeHandler);
+        viewport.on('globalmousemove', this.activeHandler);
 
-        stage.once('pointertap', (event) => {
+        viewport.once('pointertap', (event) => {
             this.stopMouseMove(mouseCircle);
-            ThreadManager.destroyVisualThread(unlinkedThread, stage);
+            ThreadManager.destroyVisualThread(unlinkedThread, viewport);
             NotesManager.notesStopLightingUp(BoardManager.getNoteMap(), noteID);
 
             const clickPointer = event.global;

@@ -3,8 +3,6 @@ import {
     Ticker,
     ContainerChild,
     Graphics,
-    Sprite,
-    Assets,
     Point
 } from "pixi.js";
 import {BaseThread} from "../threads/BaseThread.ts";
@@ -16,33 +14,32 @@ export class ThreadComponent {
     private fromNote: Container<ContainerChild>;
     private toNotePos: {x: number, y: number};
     private fromNotePos: {x: number, y: number};
-    private threadType: BaseThread;
-    private framesSinceMoved = 0;
+    private thread: BaseThread;
+    private isOnTop: boolean = false;
+    private threadContainer: Container<ContainerChild> = new Container();
+    private viewport: Container<ContainerChild>;
 
-    constructor(fromNote: Container<ContainerChild>, toNote: Container<ContainerChild>, threadType: BaseThread) {
+    constructor(fromNote: Container<ContainerChild>, toNote: Container<ContainerChild>, threadType: BaseThread, viewport: Container<ContainerChild>) {
         this.fromNote = fromNote;
         this.toNote = toNote;
         this.toNotePos = {x:toNote.getBounds().x , y: toNote.getBounds().y};
         this.fromNotePos = {x:fromNote.getBounds().x, y: fromNote.getBounds().y};
-        this.threadType = threadType;
+        this.thread = threadType;
+        this.viewport = viewport;
     }
 
-    public makeThreadWithPins(stage: Container<ContainerChild> ): Container<ContainerChild> {
-        const container = new Container();
+    public makeThreadWithPins(): Container<ContainerChild> {
+        this.makeLineVisual();
 
-        this.makeLineVisual(container);
+        this.viewport.addChildAt(this.threadContainer, 0);
 
-        this.makeThePins(container);
-
-        stage.addChild(container);
-
-        return container;
+        return this.threadContainer;
     }
 
-    private makeLineVisual(container: Container<ContainerChild>): Graphics {
+    private makeLineVisual(): Graphics {
         const line = new Graphics();
 
-        container.addChild(line);
+        this.threadContainer.addChild(line);
 
         this.drawLine(line);
 
@@ -62,52 +59,13 @@ export class ThreadComponent {
         return line;
     }
 
-    private makeThePins(container: Container<ContainerChild>) {
-
-        const bounds = this.getTheLocalPosition();
-        const threadOriginPos  = this.calculateDisplayCoordinates(bounds.start, bounds.startBounds);
-        const threadEndPos = this.calculateDisplayCoordinates(bounds.end, bounds.endBounds);
-
-        this.makeThePinSprite(container, threadOriginPos, "origin");
-        this.makeThePinSprite(container, threadEndPos, "end");
-
-    }
-
-    private async makeThePinSprite(container: Container<ContainerChild>, pinPos: {x: number, y: number}, place: string) {
-        try {
-            const texture = await Assets.load('/pin.png');
-            const pinSprite = new Sprite(texture);
-
-            pinSprite.anchor.set(0.5)
-            pinSprite.position.set(pinPos.x + 6, pinPos.y - 8);
-            pinSprite.scale.set(.05);
-
-            pinSprite.eventMode = 'static';
-
-            container.addChild(pinSprite);
-
-            const updateCallback = () => {
-                if (!pinSprite.parent) {
-                    Ticker.shared.remove(updateCallback);
-                    return;
-                }
-                this.updateThreads(pinSprite, place);
-            };
-
-            Ticker.shared.add(updateCallback);
-
-        } catch (error) {
-            console.error("Pin failed to load", error);
-        }
-    }
-
     private drawLine(line: Graphics) {
 
         const bounds = this.getTheLocalPosition();
         const threadOriginPos  = this.calculateDisplayCoordinates(bounds.start, bounds.startBounds);
         const threadEndPos  = this.calculateDisplayCoordinates(bounds.end, bounds.endBounds);
 
-        line.moveTo(threadOriginPos.x, threadOriginPos.y ).lineTo(threadEndPos.x , threadEndPos.y).stroke({width: 2, color: this.threadType.getColor()});
+        line.moveTo(threadOriginPos.x, threadOriginPos.y ).lineTo(threadEndPos.x , threadEndPos.y).stroke({width: 2, color: this.thread.getColor()});
     }
 
     private getTheLocalPosition(): {start: Point, end: Point, startBounds: {width: number, height: number}, endBounds: {width: number, height: number}} {
@@ -128,30 +86,19 @@ export class ThreadComponent {
 
     private updateLine(line: Graphics) {
         if (this.notesMoved()) {
-            this.framesSinceMoved = 2;
             line.clear();
             this.drawLine(line)
+            this.isOnTop = true;
 
             this.toNotePos = {x: this.toNote.position.x, y: this.toNote.position.y};
             this.fromNotePos =  {x: this.fromNote.position.x, y: this.fromNote.position.y};
+
+            this.threadContainer.zIndex = this.viewport.children.length + 1;
         }
-    }
-
-    private updateThreads(pinSprite: Sprite, place: string) {
-        if (this.framesSinceMoved > 0) {
-            const bounds = this.getTheLocalPosition();
-            let targetPos: { x: number, y: number };
-
-            if (place === "origin") {
-                targetPos = this.calculateDisplayCoordinates(bounds.start, bounds.startBounds);
-            } else {
-                targetPos = this.calculateDisplayCoordinates(bounds.end, bounds.endBounds);
-            }
-
-            pinSprite.x = targetPos.x + 6;
-            pinSprite.y = targetPos.y - 8;
-
-            this.framesSinceMoved--;
+        else if (this.isOnTop) {
+            console.log(this.isOnTop);
+            this.threadContainer.zIndex = this.viewport.children.length - 0.5;
+            this.isOnTop = false;
         }
     }
 
@@ -174,7 +121,7 @@ export class ThreadComponent {
         target.cursor = 'pointer';
 
         target.on("rightclick", (event) => {
-            useContextMenu(event.nativeEvent as MouseEvent, ThreadMenu, this.threadType.getThreadID());
+            useContextMenu(event.nativeEvent as MouseEvent, ThreadMenu, this.thread.getThreadID());
         });
     }
 }

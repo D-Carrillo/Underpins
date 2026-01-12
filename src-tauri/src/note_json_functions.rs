@@ -2,8 +2,8 @@ use crate::save_and_load_functions::{load_from_json, save_to_json};
 
 #[derive(serde::Serialize, serde:: Deserialize)]
 pub struct Coordinates {
-    x: i16,
-    y: i16
+    x: f64,
+    y: f64
 }
 
 #[derive(serde::Serialize, serde:: Deserialize)]
@@ -22,7 +22,7 @@ pub enum Notes {
         id: String,
         position: Coordinates,
         sizes: Size,
-        z_position: u32
+        z_position: f64
     },
 
     #[serde(rename = "TextNote")]
@@ -32,7 +32,7 @@ pub enum Notes {
         id: String,
         position: Coordinates,
         sizes: Size,
-        z_position: u32
+        z_position: f64
     }
 }
 
