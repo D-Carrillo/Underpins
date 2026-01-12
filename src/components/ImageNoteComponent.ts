@@ -6,13 +6,12 @@ import {ImageNoteMenu} from "../menus/ImageNoteMenu.ts";
 
 export class ImageNoteComponent extends BaseNoteComponent{
 
-    constructor(concrete_note: ImageNote, stage: Container<ContainerChild>) {
-        super(concrete_note, stage);
+    constructor(concrete_note: ImageNote, viewport: Container<ContainerChild>) {
+        super(concrete_note, viewport);
     }
 
     public makeNote(): Container {
-        this.NoteGroup.label = this.note.id;
-        this.makeNoteBaseGraphics(ImageNoteMenu)
+        this.makeNoteBaseGraphics(ImageNoteMenu);
 
         return this.NoteGroup;
     }

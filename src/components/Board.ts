@@ -30,13 +30,12 @@ export class Board {
 
         // Put a loading image to make sure the threads are not seen all over the place, but only when the board has fully loaded.
         this.loadMenu();
-        this.loadSavedNotes();
-        this.loadThreads();
+        this.loadSavedNotes().then(() => this.loadThreads());
         this.observerFunctionForNotes();
         this.observerFunctionForThreads();
     }
 
-    private loadSavedNotes(){
+    private async loadSavedNotes(){
         NotesManager.getNotes().forEach(note => this.createVisualNote(note));
     }
 
@@ -99,12 +98,11 @@ export class Board {
         else {
             throw Error("Instance was not of any know type of note");
         }
-
         this.noteMap.set(note.id, singularNoteContainer);
     }
 
     private makeThreadVisual(originID: string, destinationID: string, threadType: BaseThread) {
-        const singularThreadContainer = new ThreadComponent(this.noteMap.get(originID)!, this.noteMap.get(destinationID)!, threadType, this.viewport).makeThreadWithPins()
+        const singularThreadContainer = new ThreadComponent(this.noteMap.get(originID)!, this.noteMap.get(destinationID)!, threadType, this.viewport).makeThread();
         this.threadMap.set(threadType.getThreadID(), singularThreadContainer);
     }
 

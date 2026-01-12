@@ -28,10 +28,10 @@ export class ThreadComponent {
         this.viewport = viewport;
     }
 
-    public makeThreadWithPins(): Container<ContainerChild> {
+    public makeThread(): Container<ContainerChild> {
         this.makeLineVisual();
 
-        this.viewport.addChildAt(this.threadContainer, 0);
+        this.viewport.addChildAt(this.threadContainer, this.viewport.children.length);
 
         return this.threadContainer;
     }
@@ -96,7 +96,6 @@ export class ThreadComponent {
             this.threadContainer.zIndex = this.viewport.children.length + 1;
         }
         else if (this.isOnTop) {
-            console.log(this.isOnTop);
             this.threadContainer.zIndex = this.viewport.children.length - 0.5;
             this.isOnTop = false;
         }

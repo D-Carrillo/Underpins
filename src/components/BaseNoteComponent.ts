@@ -2,6 +2,7 @@ import {BaseNote} from "../notes/BaseNote.ts";
 import {Container, ContainerChild, FederatedPointerEvent, Graphics, BlurFilter} from "pixi.js";
 import {MenuCreator, useContextMenu} from "../menus/BaseMenu.ts";
 import {PinComponent} from "./PinComponent.ts";
+import {NotesManager} from "../managers/NoteManager.ts";
 
 const MIN_DISTANCE = 5;
 
@@ -21,12 +22,12 @@ export abstract class BaseNoteComponent {
         this.note = note;
         this.NoteGroup = new Container();
         this.viewport = viewport;
-
-        this.setZAxisPosition();
     }
 
     protected makeNoteBaseGraphics(Menu: MenuCreator) {
         this.makeRectangle(Menu);
+
+        this.NoteGroup.label = this.note.id;
 
         PinComponent.addPin(this.NoteGroup).then();
     }
@@ -49,7 +50,8 @@ export abstract class BaseNoteComponent {
         this.makeDraggable();
         this.makeEditable(Menu);
 
-        this.viewport.addChildAt(this.NoteGroup, 0);
+        this.NoteGroup.zIndex = this.note.getZAxisPosition();
+        this.viewport.addChild(this.NoteGroup);
     }
 
     protected onDragStartHelper(event: FederatedPointerEvent) {
@@ -62,6 +64,9 @@ export abstract class BaseNoteComponent {
         this.offset.y = this.NoteGroup.y - localPos.y;
 
         this.viewport.on('pointermove', this.onDragMove);
+
+        this.note.moveZAxis(NotesManager.assignZPosition());
+        this.NoteGroup.zIndex = this.note.getZAxisPosition();
     }
 
     private onDragMove=  (event: FederatedPointerEvent) => {
@@ -69,9 +74,6 @@ export abstract class BaseNoteComponent {
             const localPos = this.viewport.toLocal(event.global);
             this.dragTarget.x = localPos.x + this.offset.x;
             this.dragTarget.y = localPos.y + this.offset.y;
-
-            this.note.moveZAxis(this.viewport.children.length);
-            this.NoteGroup.zIndex = this.note.getZAxisPosition();
         }
     }
 
@@ -88,9 +90,6 @@ export abstract class BaseNoteComponent {
             this.dragTarget.alpha = 1;
             this.dragTarget.getChildAt(0).alpha = 1;
             this.dragTarget = null;
-
-            this.note.moveZAxis(this.viewport.children.length - 1);
-            this.NoteGroup.zIndex = this.note.getZAxisPosition();
 
             return distance < MIN_DISTANCE;
         }
@@ -112,13 +111,5 @@ export abstract class BaseNoteComponent {
             event.stopPropagation();
             useContextMenu(event.nativeEvent as MouseEvent, Menu, this.note.id);
         });
-    }
-
-    private setZAxisPosition() {
-        if (this.note.ZAxisIsSet()) {
-            this.note.moveZAxis(this.NoteGroup.zIndex);
-        } else {
-            this.NoteGroup.zIndex = this.note.getZAxisPosition();
-        }
     }
 }

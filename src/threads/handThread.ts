@@ -28,7 +28,7 @@ export class HandThread {
         const position =  BoardManager.getViewport()?.toLocal(event);
         mouseCircle.position.set(position!.x, position!.y);
 
-        const unlinkedThread = new ThreadComponent(BoardManager.getNote(noteID)!, mouseCircle, new BaseThread(noteID + "_Fake"), viewport).makeThreadWithPins();
+        const unlinkedThread = new ThreadComponent(BoardManager.getNote(noteID)!, mouseCircle, new BaseThread(noteID + "_Fake"), viewport).makeThread();
 
         viewport.on('globalmousemove', this.activeHandler);
 

@@ -22,7 +22,6 @@ export class TextNoteComponent extends BaseNoteComponent{
     }
 
     public makeNote(): Container {
-        this.NoteGroup.label = this.note.id;
         this.makeNoteBaseGraphics(TextNoteMenu);
 
         return this.NoteGroup;
@@ -30,6 +29,7 @@ export class TextNoteComponent extends BaseNoteComponent{
 
     protected override makeNoteBaseGraphics(Menu: MenuCreator) {
         super.makeNoteBaseGraphics(Menu);
+
         this.NoteGroup.addChild(this.text);
     }
 

@@ -6,8 +6,9 @@ import {NoteTypes} from "../factories/NoteTypesEnum.ts";
 import {invoke} from "@tauri-apps/api/core";
 
 class ManagerForNotes{
-    private readonly notes: BaseNote[] = [];
+    private notes: BaseNote[] = [];
     private deletedNotes: {note: BaseNote, date: number}[]= [];
+    private ZAxisCounter = 0;
 
     constructor() {
         makeAutoObservable(this);
@@ -16,6 +17,9 @@ class ManagerForNotes{
 
     public createNote(x: number, y: number, type: NoteTypes, content: string) {
         const newNote = NoteFactory.makeNote(x, y, type, content);
+
+        newNote.moveZAxis(this.assignZPosition());
+
         this.AddANote(newNote);
         return newNote;
     }
@@ -23,6 +27,8 @@ class ManagerForNotes{
     private makeNotes(note: {type: string, create_at: number, content: string, id: string, position: {x: number, y: number}, size: {height: number, width:number}, z_position: number}) {
         const loadedNote = NoteFactory.loadNote(note.type, note.position.x, note.position.y, note.content, note.id, note.create_at, note.z_position);
         this.notes.push(loadedNote);
+
+        this.notes.sort((a, b) => a.getZAxisPosition() - b.getZAxisPosition()).forEach(note => note.moveZAxis(this.assignZPosition()));
     }
 
     public getNotes(): BaseNote[] {
@@ -105,6 +111,14 @@ class ManagerForNotes{
 
         return lastDeletedNote?.date || null;
     }
+
+    public assignZPosition = () => {
+        const currPos = this.ZAxisCounter;
+        this.increaseZPosition();
+        return currPos;
+    };
+
+    private increaseZPosition = () => this.ZAxisCounter++;
 }
 
 export const NotesManager = new ManagerForNotes();

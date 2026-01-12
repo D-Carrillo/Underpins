@@ -35,14 +35,10 @@ export abstract class BaseNote
     }
 
     public moveZAxis(pos: number) {
-        this.z_position = pos;
+         this.z_position = pos;
     }
 
     public getZAxisPosition = (): number => this.z_position;
 
     abstract updateContent: (newContent: string) => void;
-
-    public ZAxisIsSet() {
-        return this.z_position === -1;
-    }
 }

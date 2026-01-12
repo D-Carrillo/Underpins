@@ -46,8 +46,6 @@ async function init() {
       maxWidth: Math.floor(window.innerWidth * 2.5),
       maxHeight: Math.floor(window.innerHeight * 2.5),
     });
-
-    console.log("I got run");
   });
 
   await loadFonts();
