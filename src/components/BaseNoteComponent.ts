@@ -1,6 +1,7 @@
 import {BaseNote} from "../notes/BaseNote.ts";
-import {Container, ContainerChild, FederatedPointerEvent, Graphics, BlurFilter, Assets, Sprite} from "pixi.js";
+import {Container, ContainerChild, FederatedPointerEvent, Graphics, BlurFilter} from "pixi.js";
 import {MenuCreator, useContextMenu} from "../menus/BaseMenu.ts";
+import {PinComponent} from "./PinComponent.ts";
 
 const MIN_DISTANCE = 5;
 
@@ -26,7 +27,8 @@ export abstract class BaseNoteComponent {
 
     protected makeNoteBaseGraphics(Menu: MenuCreator) {
         this.makeRectangle(Menu);
-        this.addPin().then();
+
+        PinComponent.addPin(this.NoteGroup).then();
     }
 
     private makeRectangle(Menu: (e: MouseEvent, m: HTMLDivElement, t: string) => void) {
@@ -110,24 +112,6 @@ export abstract class BaseNoteComponent {
             event.stopPropagation();
             useContextMenu(event.nativeEvent as MouseEvent, Menu, this.note.id);
         });
-    }
-
-    private async addPin() {
-        try {
-            const texture = await Assets.load('/pin.png');
-            const pinSprite = new Sprite(texture);
-
-            pinSprite.anchor.set(0.5)
-            pinSprite.position.set((this.NoteGroup.width / 2) + 6, this.NoteGroup.getLocalBounds().y + 2);
-            pinSprite.scale.set(.05);
-
-            pinSprite.eventMode = 'static';
-
-            this.NoteGroup.addChild(pinSprite);
-
-        } catch (error) {
-            console.error("Pin failed to load", error);
-        }
     }
 
     private setZAxisPosition() {

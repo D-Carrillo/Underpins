@@ -1,7 +1,6 @@
 import {BaseNote} from "../notes/BaseNote.ts";
 import {describe, it, expect, test} from "vitest";
 import { any } from "./anyType.ts";
-import {ImageNote} from "../notes/ImageNote.ts";
 
 type Constructor<T> = new (content: string, x_coordinate: number, y_coordinate: number) => T;
 
