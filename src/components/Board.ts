@@ -39,12 +39,13 @@ export class Board {
 
         // Put a loading image to make sure the threads are not seen all over the place, but only when the board has fully loaded.
         this.loadMenu();
-        this.loadSavedNotes().then(() => this.loadThreads());
+        this.loadSavedNotes();
+        this.loadThreads();
         this.observerFunctionForNotes();
         this.observerFunctionForThreads();
     }
 
-    private async loadSavedNotes(){
+    private loadSavedNotes(){
         NotesManager.getNotes().forEach(note => this.createVisualNote(note));
     }
 

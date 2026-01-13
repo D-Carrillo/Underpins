@@ -55,7 +55,11 @@ export abstract class BaseNoteComponent {
     }
 
     protected onDragStartHelper(event: FederatedPointerEvent) {
+        event.stopPropagation();
         this.dragTarget = event.currentTarget as Graphics;
+
+        this.NoteGroup.cacheAsTexture(true);
+
         this.dragTarget.getChildAt(0).alpha = 0.3;
         this.dragTarget.alpha = 0.7;
 
@@ -63,13 +67,14 @@ export abstract class BaseNoteComponent {
         this.offset.x = this.NoteGroup.x - localPos.x;
         this.offset.y = this.NoteGroup.y - localPos.y;
 
-        this.viewport.on('pointermove', this.onDragMove);
+        this.viewport.parent!.on('pointermove', this.onDragMove);
 
         this.note.moveZAxis(NotesManager.assignZPosition());
         this.NoteGroup.zIndex = this.note.getZAxisPosition();
     }
 
     private onDragMove=  (event: FederatedPointerEvent) => {
+        event.stopPropagation();
         if (this.dragTarget) {
             const localPos = this.viewport.toLocal(event.global);
             this.dragTarget.x = localPos.x + this.offset.x;
@@ -84,9 +89,10 @@ export abstract class BaseNoteComponent {
             this.note.changeCoordinate(this.NoteGroup.x, this.NoteGroup.y);
 
             if( this.viewport ) {
-                this.viewport.off('pointermove', this.onDragMove);
+                this.viewport.parent!.off('pointermove', this.onDragMove);
             }
 
+            this.NoteGroup.cacheAsTexture(false);
             this.dragTarget.alpha = 1;
             this.dragTarget.getChildAt(0).alpha = 1;
             this.dragTarget = null;
