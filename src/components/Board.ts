@@ -28,6 +28,15 @@ export class Board {
         BoardManager.setNoteMap(() => this.noteMap);
         BoardManager.setViewport(this.viewport);
 
+        // Put this in its own place
+        const noteContainer = new Container();
+        noteContainer.eventMode = 'static';
+        const threadContainer = new Container();
+        threadContainer.eventMode = 'static';
+
+        this.viewport.addChild(noteContainer);
+        this.viewport.addChild(threadContainer);
+
         // Put a loading image to make sure the threads are not seen all over the place, but only when the board has fully loaded.
         this.loadMenu();
         this.loadSavedNotes().then(() => this.loadThreads());
@@ -91,9 +100,9 @@ export class Board {
 
         // Need to make a factory for the components - One
         if (note instanceof TextNote) {
-            singularNoteContainer = new TextNoteComponent(note, this.viewport).makeNote();
+            singularNoteContainer = new TextNoteComponent(note, this.viewport.children[0]).makeNote();
         } else if (note instanceof ImageNote){
-            singularNoteContainer = new ImageNoteComponent(note, this.viewport).makeNote();
+            singularNoteContainer = new ImageNoteComponent(note, this.viewport.children[0]).makeNote();
         }
         else {
             throw Error("Instance was not of any know type of note");
@@ -102,7 +111,7 @@ export class Board {
     }
 
     private makeThreadVisual(originID: string, destinationID: string, threadType: BaseThread) {
-        const singularThreadContainer = new ThreadComponent(this.noteMap.get(originID)!, this.noteMap.get(destinationID)!, threadType, this.viewport).makeThread();
+        const singularThreadContainer = new ThreadComponent(this.noteMap.get(originID)!, this.noteMap.get(destinationID)!, threadType, this.viewport.children[1]).makeThread();
         this.threadMap.set(threadType.getThreadID(), singularThreadContainer);
     }
 

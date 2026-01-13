@@ -9,15 +9,16 @@ import {BaseThread} from "../threads/BaseThread.ts";
 import {useContextMenu} from "../menus/BaseMenu.ts";
 import {ThreadMenu} from "../menus/ThreadMenu.ts";
 
+
 export class ThreadComponent {
     private readonly toNote: Container<ContainerChild>;
     private fromNote: Container<ContainerChild>;
     private toNotePos: {x: number, y: number};
     private fromNotePos: {x: number, y: number};
     private thread: BaseThread;
-    private isOnTop: boolean = false;
     private threadContainer: Container<ContainerChild> = new Container();
     private viewport: Container<ContainerChild>;
+    private line: Graphics = new Graphics();
 
     constructor(fromNote: Container<ContainerChild>, toNote: Container<ContainerChild>, threadType: BaseThread, viewport: Container<ContainerChild>) {
         this.fromNote = fromNote;
@@ -31,41 +32,45 @@ export class ThreadComponent {
     public makeThread(): Container<ContainerChild> {
         this.makeLineVisual();
 
-        this.viewport.addChildAt(this.threadContainer, this.viewport.children.length);
+        this.viewport.addChild(this.threadContainer);
 
         return this.threadContainer;
     }
 
     private makeLineVisual(): Graphics {
-        const line = new Graphics();
+        this.line = new Graphics();
 
-        this.threadContainer.addChild(line);
+        this.threadContainer.addChild(this.line);
 
-        this.drawLine(line);
+        this.drawLine();
 
-        this.makeEditable(line);
+        this.makeEditable();
 
+        this.threadMovesWithNote();
+
+        return this.line;
+    }
+
+    private threadMovesWithNote() {
         const updateCallBack = () => {
-            if (!line.parent) {
+            if (!this.line.parent) {
                 Ticker.shared.remove(updateCallBack);
                 return;
             }
 
-            this.updateLine(line);
+            this.updateLine();
         };
 
         Ticker.shared.add(updateCallBack);
-
-        return line;
     }
 
-    private drawLine(line: Graphics) {
+    private drawLine() {
 
         const bounds = this.getTheLocalPosition();
         const threadOriginPos  = this.calculateDisplayCoordinates(bounds.start, bounds.startBounds);
         const threadEndPos  = this.calculateDisplayCoordinates(bounds.end, bounds.endBounds);
 
-        line.moveTo(threadOriginPos.x, threadOriginPos.y ).lineTo(threadEndPos.x , threadEndPos.y).stroke({width: 2, color: this.thread.getColor()});
+        this.line.moveTo(threadOriginPos.x, threadOriginPos.y ).lineTo(threadEndPos.x , threadEndPos.y).stroke({width: 2, color: this.thread.getColor()});
     }
 
     private getTheLocalPosition(): {start: Point, end: Point, startBounds: {width: number, height: number}, endBounds: {width: number, height: number}} {
@@ -84,20 +89,13 @@ export class ThreadComponent {
         return {x: positon.x + bounds.width / 2, y: positon.y + 10};
     }
 
-    private updateLine(line: Graphics) {
+    private updateLine() {
         if (this.notesMoved()) {
-            line.clear();
-            this.drawLine(line)
-            this.isOnTop = true;
+            this.line.clear();
+            this.drawLine()
 
             this.toNotePos = {x: this.toNote.position.x, y: this.toNote.position.y};
             this.fromNotePos =  {x: this.fromNote.position.x, y: this.fromNote.position.y};
-
-            this.threadContainer.zIndex = this.viewport.children.length + 1;
-        }
-        else if (this.isOnTop) {
-            this.threadContainer.zIndex = this.viewport.children.length - 0.5;
-            this.isOnTop = false;
         }
     }
 
@@ -115,11 +113,11 @@ export class ThreadComponent {
         );
     }
 
-    private makeEditable(target: Container) {
-        target.eventMode = 'static';
-        target.cursor = 'pointer';
+    private makeEditable() {
+        this.line.eventMode = 'static';
+        this.line.cursor = 'pointer';
 
-        target.on("rightclick", (event) => {
+        this.line.on("rightclick", (event) => {
             useContextMenu(event.nativeEvent as MouseEvent, ThreadMenu, this.thread.getThreadID());
         });
     }
