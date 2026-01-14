@@ -3,6 +3,7 @@ import {Container, ContainerChild, FederatedPointerEvent, Graphics, BlurFilter} 
 import {MenuCreator, useContextMenu} from "../menus/BaseMenu.ts";
 import {PinComponent} from "./PinComponent.ts";
 import {NotesManager} from "../managers/NoteManager.ts";
+import {PinManager} from "../managers/PinManager.ts";
 
 const MIN_DISTANCE = 5;
 
@@ -55,12 +56,10 @@ export abstract class BaseNoteComponent {
     }
 
     protected onDragStartHelper(event: FederatedPointerEvent) {
-        event.stopPropagation();
         this.dragTarget = event.currentTarget as Graphics;
 
         this.NoteGroup.cacheAsTexture(true);
 
-        this.dragTarget.getChildAt(0).alpha = 0.3;
         this.dragTarget.alpha = 0.7;
 
         const localPos = this.dragTarget.parent!.toLocal(event.global);
@@ -74,11 +73,14 @@ export abstract class BaseNoteComponent {
     }
 
     private onDragMove=  (event: FederatedPointerEvent) => {
-        event.stopPropagation();
         if (this.dragTarget) {
             const localPos = this.viewport.toLocal(event.global);
             this.dragTarget.x = localPos.x + this.offset.x;
             this.dragTarget.y = localPos.y + this.offset.y;
+
+            if (PinManager.aPinIsBelow(this.dragTarget)) {
+                console.log("Is on top");
+            }
         }
     }
 
