@@ -1,5 +1,13 @@
 import {BaseNote} from "../notes/BaseNote.ts";
-import {Container, ContainerChild, FederatedPointerEvent, Graphics, BlurFilter} from "pixi.js";
+import {
+    Container,
+    ContainerChild,
+    FederatedPointerEvent,
+    Graphics,
+    BlurFilter,
+    ColorMatrixFilter,
+    Sprite
+} from "pixi.js";
 import {MenuCreator, useContextMenu} from "../menus/BaseMenu.ts";
 import {PinComponent} from "./PinComponent.ts";
 import {NotesManager} from "../managers/NoteManager.ts";
@@ -13,6 +21,7 @@ export abstract class BaseNoteComponent {
     protected viewport: Container<ContainerChild>;
     protected dragTarget: Graphics | null = null;
     protected offset = {x: 0, y: 0};
+    private pin: Sprite | null = null;
 
     public abstract makeNote(): Container;
     protected abstract makeDraggable(...args: any[]): void;
@@ -30,7 +39,7 @@ export abstract class BaseNoteComponent {
 
         this.NoteGroup.label = this.note.id;
 
-        PinComponent.addPin(this.NoteGroup).then();
+        PinComponent.addPin(this.NoteGroup).then(sprite => this.pin = sprite);
     }
 
     private makeRectangle(Menu: (e: MouseEvent, m: HTMLDivElement, t: string) => void) {
@@ -78,8 +87,17 @@ export abstract class BaseNoteComponent {
             this.dragTarget.x = localPos.x + this.offset.x;
             this.dragTarget.y = localPos.y + this.offset.y;
 
-            if (PinManager.aPinIsBelow(this.dragTarget)) {
-                console.log("Is on top");
+            this.NoteGroup.cacheAsTexture( false);
+
+            if (PinManager.aPinIsBelow(this.dragTarget, this.pin!)) {
+                const redFilter = new ColorMatrixFilter();
+                this.dragTarget.filters = [redFilter];
+                redFilter.tint(0xff0000);
+
+                console.log("true when it should not be true");
+            }
+            else {
+                this.dragTarget.filters = [];
             }
         }
     }
@@ -97,6 +115,7 @@ export abstract class BaseNoteComponent {
             this.NoteGroup.cacheAsTexture(false);
             this.dragTarget.alpha = 1;
             this.dragTarget.getChildAt(0).alpha = 1;
+            this.NoteGroup.filters = [];
             this.dragTarget = null;
 
             return distance < MIN_DISTANCE;

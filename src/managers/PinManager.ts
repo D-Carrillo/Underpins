@@ -7,15 +7,15 @@ class ManagerForPins {
         this.pins.push(pin);
     }
 
-    public aPinIsBelow(note: Graphics): boolean {
+    public aPinIsBelow(note: Graphics, pin: Sprite): boolean {
         const noteBounds = note.getBounds(true);
 
-        return this.pins.some(pin => this.checkIfBelow(pin, noteBounds, note));
+        return this.pins.some(pinInstance => this.checkIfBelow(pinInstance, noteBounds, note, pin));
     }
 
-    private checkIfBelow(pin: Sprite, noteBounds: Bounds, note: Graphics): boolean {
-        if (pin !== note.getChildByLabel("pin") && pin.zIndex < note.zIndex) {
-            const pinBounds = pin.getBounds(true);
+    private checkIfBelow(pinInstance: Sprite, noteBounds: Bounds, note: Graphics, pin: Sprite): boolean {
+        if (pinInstance != pin && pinInstance.zIndex < note.zIndex) {
+            const pinBounds = pinInstance.getBounds(true);
 
             return pinBounds.x + pinBounds.width > noteBounds.x &&
                 pinBounds.x < noteBounds.x + noteBounds.width &&
