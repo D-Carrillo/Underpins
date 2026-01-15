@@ -14,6 +14,8 @@ class ManagerForPins {
     }
 
     private checkIfBelow(pinInstance: Sprite, noteBounds: Bounds, note: Graphics, pin: Sprite): boolean {
+        if (pin === undefined) {console.log("This was undefined");}
+
         if (pinInstance != pin && pinInstance.zIndex < note.zIndex) {
             const pinBounds = pinInstance.getBounds(true);
 
@@ -22,6 +24,7 @@ class ManagerForPins {
                 pinBounds.y + pinBounds.height > noteBounds.y &&
                 pinBounds.y < noteBounds.y + noteBounds.height;
         }
+
         return false;
     }
 }

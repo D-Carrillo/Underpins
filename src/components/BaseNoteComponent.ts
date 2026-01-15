@@ -67,8 +67,6 @@ export abstract class BaseNoteComponent {
     protected onDragStartHelper(event: FederatedPointerEvent) {
         this.dragTarget = event.currentTarget as Graphics;
 
-        this.NoteGroup.cacheAsTexture(true);
-
         this.dragTarget.alpha = 0.7;
 
         const localPos = this.dragTarget.parent!.toLocal(event.global);
@@ -87,14 +85,11 @@ export abstract class BaseNoteComponent {
             this.dragTarget.x = localPos.x + this.offset.x;
             this.dragTarget.y = localPos.y + this.offset.y;
 
-            this.NoteGroup.cacheAsTexture( false);
-
             if (PinManager.aPinIsBelow(this.dragTarget, this.pin!)) {
                 const redFilter = new ColorMatrixFilter();
                 this.dragTarget.filters = [redFilter];
                 redFilter.tint(0xff0000);
-
-                console.log("true when it should not be true");
+                redFilter.alpha = 0.5;
             }
             else {
                 this.dragTarget.filters = [];
@@ -106,13 +101,17 @@ export abstract class BaseNoteComponent {
         if (this.dragTarget) {
             const distance = this.getDistance();
 
-            this.note.changeCoordinate(this.NoteGroup.x, this.NoteGroup.y);
+            if (PinManager.aPinIsBelow(this.dragTarget, this.pin!)) {
+                this.dragTarget.position.set(this.note.position.x, this.note.position.y);
+            }
+            else {
+                this.note.changeCoordinate(this.NoteGroup.x, this.NoteGroup.y);
+            }
 
             if( this.viewport ) {
                 this.viewport.parent!.off('pointermove', this.onDragMove);
             }
 
-            this.NoteGroup.cacheAsTexture(false);
             this.dragTarget.alpha = 1;
             this.dragTarget.getChildAt(0).alpha = 1;
             this.NoteGroup.filters = [];
