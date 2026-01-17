@@ -22,6 +22,7 @@ export abstract class BaseNoteComponent {
     protected dragTarget: Graphics | null = null;
     protected offset = {x: 0, y: 0};
     private pin: Sprite | null = null;
+    currZAxis: number = 0;
 
     public abstract makeNote(): Container;
     protected abstract makeDraggable(...args: any[]): void;
@@ -60,7 +61,7 @@ export abstract class BaseNoteComponent {
         this.makeDraggable();
         this.makeEditable(Menu);
 
-        this.NoteGroup.zIndex = this.note.getZAxisPosition();
+        this.NoteGroup.zIndex = this.currZAxis = this.note.getZAxisPosition();
         this.viewport.addChild(this.NoteGroup);
     }
 
@@ -77,6 +78,10 @@ export abstract class BaseNoteComponent {
 
         this.note.moveZAxis(NotesManager.assignZPosition());
         this.NoteGroup.zIndex = this.note.getZAxisPosition();
+
+        if (this.dragTarget) {
+            this.checkIfAPinIsBellow();
+        }
     }
 
     private onDragMove=  (event: FederatedPointerEvent) => {
@@ -84,16 +89,18 @@ export abstract class BaseNoteComponent {
             const localPos = this.viewport.toLocal(event.global);
             this.dragTarget.x = localPos.x + this.offset.x;
             this.dragTarget.y = localPos.y + this.offset.y;
+            this.checkIfAPinIsBellow();
+        }
+    }
 
-            if (PinManager.aPinIsBelow(this.dragTarget, this.pin!)) {
-                const redFilter = new ColorMatrixFilter();
-                this.dragTarget.filters = [redFilter];
-                redFilter.tint(0xff0000);
-                redFilter.alpha = 0.5;
-            }
-            else {
-                this.dragTarget.filters = [];
-            }
+    private checkIfAPinIsBellow() {
+        if (PinManager.aPinIsBelow(this.dragTarget!, this.pin!)) {
+            const redFilter = new ColorMatrixFilter();
+            this.dragTarget!.filters = [redFilter];
+            redFilter.tint(0xff0000);
+            redFilter.alpha = 0.5;
+        } else {
+            this.dragTarget!.filters = [];
         }
     }
 
@@ -103,9 +110,11 @@ export abstract class BaseNoteComponent {
 
             if (PinManager.aPinIsBelow(this.dragTarget, this.pin!)) {
                 this.dragTarget.position.set(this.note.position.x, this.note.position.y);
+                this.NoteGroup.zIndex = this.currZAxis;
             }
             else {
                 this.note.changeCoordinate(this.NoteGroup.x, this.NoteGroup.y);
+                this.currZAxis = this.NoteGroup.zIndex;
             }
 
             if( this.viewport ) {
