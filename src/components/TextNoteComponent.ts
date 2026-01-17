@@ -6,14 +6,12 @@ import {
     TextStyle,
 } from "pixi.js";
 import {TextNote as TextN} from "../notes/TextNote.ts";
-import {TextEditor} from "./TextEditor.ts";
 import {TextNoteMenu} from "../menus/TextNoteMenu.ts";
 import {BoardManager} from "../managers/BoardManager.ts";
 import {BaseNoteComponent} from "./BaseNoteComponent.ts";
 import {MenuCreator} from "../menus/BaseMenu.ts";
 
 export class TextNoteComponent extends BaseNoteComponent{
-    private editing: TextEditor | null = null;
     private readonly text: Text;
 
     constructor(concrete_note: TextN, stage: Container<ContainerChild>) {
@@ -61,14 +59,18 @@ export class TextNoteComponent extends BaseNoteComponent{
     }
 
     private closeEditor() {
-        if (this.editing !== null) {
-            setTimeout(() => {
-                BoardManager.getViewport()!.off('pointerdown', this.closeOnBlur);
-            }, 0);
-            this.editing.close();
-            this.editing = null;
+        const textArea = document.getElementById('pixi-html-editor');
+        if (textArea) {
+            textArea.remove();
         }
+
+        this.text.visible = true;
     }
+
+    private getEditing(text: Text) {
+        console.log(text);
+    }
+
 
     protected onDragStart = (event: FederatedPointerEvent) => {
         this.closeEditor();
@@ -89,17 +91,6 @@ export class TextNoteComponent extends BaseNoteComponent{
 
 
         this.startListeners(this.NoteGroup, this.onDragStart, this.onDragEnd)
-    }
-
-    private getEditing(text: Text) {
-        if(this.editing) {
-            this.editing.close();
-        }
-
-        this.editing = new TextEditor(text, this.note as TextN);
-        this.editing.open();
-
-        BoardManager.getViewport()!.on('pointerdown', this.closeOnBlur);
     }
 
     private closeOnBlur = (event: FederatedPointerEvent) => {

@@ -4,6 +4,7 @@ import {BaseNote} from "../notes/BaseNote.ts";
 import {BlurFilter, Container, ContainerChild, Graphics} from "pixi.js";
 import {NoteTypes} from "../factories/NoteTypesEnum.ts";
 import {invoke} from "@tauri-apps/api/core";
+import {PinManager} from "./PinManager.ts";
 
 class ManagerForNotes{
     private notes: BaseNote[] = [];
@@ -27,8 +28,6 @@ class ManagerForNotes{
     private makeNotes(note: {type: string, create_at: number, content: string, id: string, position: {x: number, y: number}, size: {height: number, width:number}, z_position: number}) {
         const loadedNote = NoteFactory.loadNote(note.type, note.position.x, note.position.y, note.content, note.id, note.create_at, note.z_position);
         this.notes.push(loadedNote);
-
-        this.notes.sort((a, b) => a.getZAxisPosition() - b.getZAxisPosition()).forEach(note => note.moveZAxis(this.assignZPosition()));
     }
 
     public getNotes(): BaseNote[] {
@@ -76,6 +75,7 @@ class ManagerForNotes{
     }
 
     public destroyVisualNote(noteVisual: Container<ContainerChild>) {
+        PinManager.deletePin("pin" + noteVisual.label);
         noteVisual.destroy({children: true});
     }
 

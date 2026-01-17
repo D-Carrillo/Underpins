@@ -3,7 +3,7 @@ import {showMenu} from "./MainMenus/showMenu.ts";
 import {loadFonts, prepareBitmapFont} from "../fonts/loadFonts.ts";
 import { Viewport } from "pixi-viewport";
 
-const app = new Application();
+export const app = new Application();
 
 async function init() {
   await app.init({

@@ -9,7 +9,6 @@ import {BaseThread} from "../threads/BaseThread.ts";
 import {useContextMenu} from "../menus/BaseMenu.ts";
 import {ThreadMenu} from "../menus/ThreadMenu.ts";
 
-
 export class ThreadComponent {
     private readonly toNote: Container<ContainerChild>;
     private fromNote: Container<ContainerChild>;
@@ -23,8 +22,8 @@ export class ThreadComponent {
     constructor(fromNote: Container<ContainerChild>, toNote: Container<ContainerChild>, threadType: BaseThread, viewport: Container<ContainerChild>) {
         this.fromNote = fromNote;
         this.toNote = toNote;
-        this.toNotePos = {x:toNote.getBounds().x , y: toNote.getBounds().y};
-        this.fromNotePos = {x:fromNote.getBounds().x, y: fromNote.getBounds().y};
+        this.toNotePos = {x: toNote.getBounds().x, y: toNote.getBounds().y};
+        this.fromNotePos = {x: fromNote.getBounds().x, y: fromNote.getBounds().y};
         this.thread = threadType;
         this.viewport = viewport;
     }

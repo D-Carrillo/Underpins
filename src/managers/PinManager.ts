@@ -1,23 +1,30 @@
 import {Bounds, Graphics, Sprite} from "pixi.js";
 
 class ManagerForPins {
-    private pins: Sprite[] = [];
+    private pins: Map<string, Sprite> = new Map<string, Sprite>();
 
-    public addPin(pin: Sprite) {
-        this.pins.push(pin);
+    public addPin(pinLabel: string, pin: Sprite) {
+        this.pins.set(pinLabel, pin);
+    }
+
+    public deletePin(pinLabel: string) {
+        if (this.pins.has(pinLabel)) {
+            this.pins.delete(pinLabel);
+        }
     }
 
     public aPinIsBelow(note: Graphics, pin: Sprite): boolean {
         const noteBounds = note.getBounds(true);
 
-        return this.pins.some(pinInstance => this.checkIfBelow(pinInstance, noteBounds, note, pin));
+        return Array.from(this.pins.values()).some(pinInstance => this.checkIfBelow(pinInstance, noteBounds, note, pin));
     }
 
     private checkIfBelow(pinInstance: Sprite, noteBounds: Bounds, note: Graphics, pin: Sprite): boolean {
-        if (pin === undefined) {console.log("This was undefined");}
+        if (pin === undefined) {console.log("The pin was undefined");}
 
-        if (pinInstance != pin && pinInstance.zIndex < note.zIndex) {
+        if (pinInstance.label != pin.label && pinInstance.zIndex < note.zIndex) {
             const pinBounds = pinInstance.getBounds(true);
+
 
             return pinBounds.x + pinBounds.width > noteBounds.x &&
                 pinBounds.x < noteBounds.x + noteBounds.width &&

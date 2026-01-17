@@ -95,8 +95,8 @@ class ManagerForThreads{
         this.deletedThreads.length = 0;
     }
 
-    public destroyVisualThread(threadVisual: Container<ContainerChild>, stage: Container<ContainerChild>) {
-        stage.removeChild(threadVisual);
+    public destroyVisualThread(threadVisual: Container<ContainerChild>, viewport: Container<ContainerChild>) {
+        viewport.removeChild(threadVisual);
 
         threadVisual.destroy({
             children: true,

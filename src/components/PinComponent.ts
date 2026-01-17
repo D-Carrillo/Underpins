@@ -10,12 +10,12 @@ export class PinComponent {
             pinSprite.anchor.set(0.5)
             pinSprite.position.set((NoteGroup.width / 2) + 6, NoteGroup.getLocalBounds().y + 2);
             pinSprite.scale.set(.05);
-            pinSprite.label = "pin";
+            pinSprite.label = "pin" + NoteGroup.label;
 
             pinSprite.eventMode = 'static';
 
             NoteGroup.addChild(pinSprite);
-            PinManager.addPin(pinSprite);
+            PinManager.addPin(pinSprite.label, pinSprite);
 
             return pinSprite;
 

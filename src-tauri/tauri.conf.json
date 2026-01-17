@@ -5,7 +5,7 @@
   "identifier": "com.diego.underpins",
   "build": {
     "beforeDevCommand": "npm run dev",
-    "devUrl": "http://localhost:2420",
+    "devUrl": "http://localhost:2520",
     "beforeBuildCommand": "npm run build",
     "frontendDist": "../dist"
   },
