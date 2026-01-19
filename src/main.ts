@@ -37,8 +37,9 @@ async function init() {
   document.body.appendChild(app.canvas);
 
   window.addEventListener('resize', () => {
-    viewport.worldWidth = window.innerWidth;
-    viewport.worldHeight = window.innerHeight;
+    app.renderer.resize(window.innerWidth, window.innerHeight); 
+
+    viewport.resize(window.innerWidth, window.innerHeight, window.innerWidth, window.innerHeight);
 
     viewport.clampZoom({
       minWidth: Math.floor(window.innerWidth / 2),
